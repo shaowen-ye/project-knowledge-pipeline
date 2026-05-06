@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# claude-bind — bind Claude Code session storage to live inside the project directory
+#
+# Mechanism: CC stores sessions at ~/.claude/projects/<encoded>/ where <encoded>
+#            is the project's absolute path with all '/' and '.' replaced by '-'.
+#            This script makes that path a symlink to <project>/.claude-sessions/
+#            so session data follows the project across moves, archival, and
+#            cross-machine migrations.
+#
+# Privacy:   For technical projects only. Do NOT bind projects containing
+#            medical, personal, family, or financial discussions — binding moves
+#            session data into the project tree where it can be accidentally
+#            committed to git or synced to cloud storage.
+#
+# Usage (run from project root):
+#   claude-bind            bind current directory (first time)
+#   claude-bind status     show current binding status
+#   claude-bind rebind     rebuild symlink after project was moved
+#   claude-bind unbind     restore default global storage
+#
+# Install:   Save to ~/.local/bin/claude-bind, chmod +x, ensure ~/.local/bin
+#            is on your PATH.
+# Platform:  macOS / Linux, bash 3.2+
+
+set -euo pipefail
+
+CMD="${1:-bind}"
+
+# ---- Path computation ----
+project_dir="$PWD"
+encoded="$(echo "$project_dir" | sed 's|[/.]|-|g')"
+local_path="$project_dir/.claude-sessions"
+global_path="$HOME/.claude/projects/$encoded"
+
+# ---- Subcommand dispatch ----
+case "$CMD" in
+
+  status)
+    echo "Project dir:    $project_dir"
+    echo "Encoded name:   $encoded"
+    echo "Global path:    $global_path"
+    if [ -L "$global_path" ]; then
+      echo "Status:         BOUND (symlink → $(readlink "$global_path"))"
+    elif [ -d "$global_path" ]; then
+      echo "Status:         DEFAULT (regular directory, not bound)"
+    else
+      echo "Status:         UNINITIALIZED (no session history yet)"
+    fi
+    ;;
+
+  bind)
+    if [ -L "$global_path" ]; then
+      echo "Already bound: $global_path → $(readlink "$global_path")"
+      exit 0
+    fi
+
+    if [ -d "$global_path" ]; then
+      if [ -e "$local_path" ]; then
+        echo "Conflict: both global directory and $local_path exist. Resolve manually." >&2
+        exit 1
+      fi
+      echo "Moving existing sessions: $global_path → $local_path"
+      mv "$global_path" "$local_path"
+    else
+      mkdir -p "$local_path"
+    fi
+
+    ln -s "$local_path" "$global_path"
+    echo "✓ Bound: $global_path → $local_path"
+    echo ""
+    echo "REMINDERS:"
+    echo "  • Add '.claude-sessions/' to .gitignore"
+    echo "  • Sessions are stored in plaintext; OS file permissions are the only protection"
+    ;;
+
+  rebind)
+    if [ ! -d "$local_path" ]; then
+      echo "No .claude-sessions/ in current directory. Run 'claude-bind' first." >&2
+      exit 1
+    fi
+
+    # Clean up stale symlinks pointing to this local_path (left over from prior locations)
+    for link in "$HOME/.claude/projects/"*; do
+      [ -L "$link" ] || continue
+      target="$(readlink "$link")"
+      if [ "$target" = "$local_path" ] && [ "$link" != "$global_path" ]; then
+        echo "Removing stale symlink: $link"
+        rm "$link"
+      fi
+    done
+
+    if [ -e "$global_path" ]; then
+      echo "✓ Symlink already correct: $global_path"
+      exit 0
+    fi
+
+    ln -s "$local_path" "$global_path"
+    echo "✓ Rebound: $global_path → $local_path"
+    ;;
+
+  unbind)
+    if [ -L "$global_path" ]; then
+      rm "$global_path"
+    fi
+    if [ -d "$local_path" ]; then
+      mv "$local_path" "$global_path"
+      echo "✓ Restored: sessions moved back to $global_path"
+    else
+      echo "No .claude-sessions/ in current directory; nothing to restore."
+    fi
+    ;;
+
+  *)
+    echo "Usage: claude-bind [bind|status|rebind|unbind]" >&2
+    exit 1
+    ;;
+esac
