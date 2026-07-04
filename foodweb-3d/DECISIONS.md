@@ -34,7 +34,8 @@
 | D-005 | 2026-07-04 | 阶段 2 物理锚定=三峡库区（真实调度曲线+水温气候态） | data | ✅ Accepted |
 | D-006 | 2026-07-04 | 论文线 2 硬门槛：L2 规范 + Rpath/mizer 双适配器（原生格式，往返验证） | tooling | ✅ Accepted |
 | D-007 | 2026-07-04 | 论文线 1 理论核心：meta-生态系统模块 + per-capita 控制机制分类 → 相图 | methodology | ✅ Accepted |
-| D-008 | 2026-07-04 | 独立仓库化用脚本交付（会话集成无建仓权限），用户本机运行 | process | ✅ Accepted |
+| D-008 | 2026-07-04 | 独立仓库化用脚本交付（会话集成无建仓权限），用户本机运行 | process | 🔁 见 D-009 |
+| D-009 | 2026-07-04 | 迁移单元=整个 foodweb-3d/ → 独立私有仓库 shaowen-ye/foodweb-3d | process | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -382,6 +383,47 @@ L3 = **three.js r128 UMD**（暴露 `window.THREE`，全内联，CSP 友好）+ 
 
 - Code: `prototype/scripts/extract-standalone-repo.sh`, `README-standalone.md`
 - Related decisions: D-006, D-002
+
+---
+
+### D-009 迁移单元=整个 foodweb-3d/ → 独立私有仓库 shaowen-ye/foodweb-3d
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted（细化 D-008）
+- **Domain**: process
+- **Phase**: 论文线 2 发布 / 项目独立化
+
+**Background**
+
+D-008 把"软件 prototype/"提取为独立仓库。用户澄清：整个 **foodweb-3d 项目**（知识库 01–16 + DECISIONS + prototype 软件）不应寄居在 `project-knowledge-pipeline`（PR #1）之下，应迁为**独立私有仓库** `shaowen-ye/foodweb-3d`。
+
+**Options considered**
+
+1. 迁移**整个 foodweb-3d/**（知识库+软件），顶层 README 作根 README
+2. 仅迁 prototype/（D-008 原方案，软件工件）
+3. 拍平结构（prototype 提根、docs 入子目录）
+
+**Decision**
+
+采用**方案 1**：迁移单元=整个 `foodweb-3d/`，保留内部结构（docs 在根、软件在 `prototype/`）。`foodweb-3d/README.md` 已自包含（无 ../ 链接）直接作根 README。CI 移至仓库根 `foodweb-3d/.github/workflows/ci.yml`（`cd prototype && npm test`）。脚本改为 `foodweb-3d/scripts/migrate-to-standalone.sh`（`--prefix=foodweb-3d`，默认 `--private`）。仓库 URL（CITATION/package.json/l2-schema `$id`）改指 `shaowen-ye/foodweb-3d`。删除 prototype-only 的 `extract-standalone-repo.sh`/`README-standalone.md`/`prototype/.github`。
+
+**Rationale**
+
+1. foodweb-3d 是一个完整研究项目（知识库+软件+论文），不该埋在另一个 skill 工具仓库里。
+2. 保留内部结构=忠实迁移，改动最小；顶层 README 天然自包含。
+3. 根级 CI 才会在新仓库触发（GitHub 只读仓库根 `.github`）。
+
+**Consequences**
+
+- ✓ 一条本机命令产出 `shaowen-ye/foodweb-3d`（private，含历史，v0.3.0，CI 可跑）。
+- ✓ 结构清晰、链接全通、URL 正确。
+- ✗ 仍须用户本机 `gh` 执行（会话无建仓权限）。
+- ✗ 迁移后应**关闭 PR #1**（不把 foodweb-3d 并入 project-knowledge-pipeline）——需用户操作。
+
+**References**
+
+- Code: `foodweb-3d/scripts/migrate-to-standalone.sh`, `foodweb-3d/.github/workflows/ci.yml`
+- Related decisions: D-008（细化）, D-006, D-002
 
 ---
 

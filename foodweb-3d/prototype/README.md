@@ -88,9 +88,9 @@ npm test             # 引擎稳定性 + Schema + 适配器往返 + 理论模块
 npm run roundtrip    # 适配器一致性 + 生成原生引擎文件
 npm run phase-diagram
 ```
-CI：`.github/workflows/ci.yml`（Node 18/20/22 矩阵，作为独立仓库骨架）。贡献指南见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+CI：独立仓库根的 `.github/workflows/ci.yml`（Node 18/20/22 矩阵，`cd prototype && npm test`）。贡献指南见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-**提取为独立仓库**（论文线 2 §T5）：本机运行 `bash scripts/extract-standalone-repo.sh [名称] [--private|--public]`——subtree split 保留历史 + `gh` 建仓 + 推送 + 打 v0.3.0（自包含 README 见 `scripts/README-standalone.md`）。须本机跑：本会话 GitHub 集成无建仓权限。
+**迁移为独立私有仓库**（`shaowen-ye/foodweb-3d`）：本机运行 `bash ../scripts/migrate-to-standalone.sh [名称] [--private]`——把**整个 foodweb-3d/**（知识库 + 本 prototype）subtree split 保留历史 + `gh` 建私有仓 + 推送 + 打 v0.3.0。须本机跑：会话 GitHub 集成仅授权 project-knowledge-pipeline、无建仓权限。
 
 ## 引用与许可 / Cite &amp; license
 

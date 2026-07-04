@@ -1,8 +1,7 @@
 name: CI
 
-# Skeleton CI for the standalone foodweb-3d software release. When this
-# directory (foodweb-3d/prototype) becomes the repository root, this workflow
-# lives at .github/workflows/ci.yml and runs on every push / PR.
+# Repo-root CI for the standalone shaowen-ye/foodweb-3d repository.
+# The software lives in prototype/; docs live at the repo root.
 
 on:
   push:
@@ -12,6 +11,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prototype
     strategy:
       matrix:
         node-version: [18, 20, 22]
@@ -23,7 +25,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dev dependencies (ajv)
         run: npm install
-      - name: Run test suite (engine stability, schema, adapter round-trips, theory)
+      - name: Test suite (engine stability, schema, adapter round-trips, theory, closed-form)
         run: npm test
       - name: Regenerate adapter native files + phase diagram
         run: npm run adapters && npm run phase-diagram

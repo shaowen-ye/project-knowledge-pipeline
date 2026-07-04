@@ -136,7 +136,7 @@ GitHub + Zenodo DOI;许可（MIT/BSD）;文档站;测试（引擎 Node 单测已
 - [x] **T2**：**L2 交换格式规范**单独文档（字段/语义/版本/示例）→ Fig 2。✅ [`13-L2-interchange-spec.md`](13-L2-interchange-spec.md) + `prototype/data/l2-schema.json`（JSON Schema，已校验通过）。
 - [x] **T3**：≥1 真实引擎适配器证明"模型无关"（投稿硬门槛）。✅ **已提供 2 个**：`prototype/adapters/rpath-adapter.js`（Ecopath 质量平衡）+ `mizer-adapter.js`（体型谱）——两种正交范式经 L2 往返无损，`roundtrip-test.js` 全通过。
 - [x] **T4（部分）**：**测试套件 + CI + 许可 + 引用**已就位——`prototype/tests/run.js`（8 项:引擎稳定/Schema/双适配器往返/理论,全通过）、`.github/workflows/ci.yml`（Node 18/20/22）、`LICENSE`(MIT)、`CITATION.cff`、`CONTRIBUTING.md`、`package.json`。待补:文档站。
-- [~] **T5**：独立仓库化**工具已就位**——`prototype/scripts/extract-standalone-repo.sh`（subtree split 保留历史 + `gh` 建仓 + 推送 + 打 v0.3.0）+ `README-standalone.md`（自包含）。**须你本机运行**：本会话 GitHub 集成仅授权 project-knowledge-pipeline,无法新建仓库(403);`gh` 在你账户下可。之后 Zenodo DOI + JOSS 短文。
+- [~] **T5**：**迁移为独立私有仓库 `shaowen-ye/foodweb-3d`**——`foodweb-3d/scripts/migrate-to-standalone.sh`（把整个 `foodweb-3d/` subtree split 保留历史 + `gh` 建私有仓 + 推送 + 打 v0.3.0；顶层 README 直接作根 README；根级 CI）。**须你本机运行**：会话 GitHub 集成仅授权 project-knowledge-pipeline,无建仓权限(403);`gh` 在你账户下可。迁移后关闭 PR #1（不并入 pipeline），再 Zenodo DOI + JOSS 短文。
 - [ ] **T6**：整理 Fig 1/3/4/5 + Table 1;写作按 §5;投 MEE Applications。
 
 > **投稿硬门槛 T2/T3 已达成**（L2 规范+Schema、2 个真实引擎适配器往返验证）;**发布工程 T4 大部到位**（测试/CI/许可/引用/贡献指南）。剩余:独立仓库化 + Zenodo DOI（T5）、图表整理与写作（T6）。

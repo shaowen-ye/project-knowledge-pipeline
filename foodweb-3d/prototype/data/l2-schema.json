@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/shaowen-ye/project-knowledge-pipeline/foodweb-3d/l2-schema.json",
+  "$id": "https://github.com/shaowen-ye/foodweb-3d/prototype/data/l2-schema.json",
   "title": "Food-web L2 interchange format",
   "description": "Model-agnostic interchange format for meta-ecosystem food-web models: static network + dynamic trophic + spatial subsidies + physical forcing + management scenarios. Version 0.3.",
   "type": "object",

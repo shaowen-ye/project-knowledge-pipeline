@@ -17,8 +17,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shaowen-ye/project-knowledge-pipeline.git",
-    "directory": "foodweb-3d/prototype"
+    "url": "https://github.com/shaowen-ye/foodweb-3d.git",
+    "directory": "prototype"
   },
   "engines": {
     "node": ">=18"

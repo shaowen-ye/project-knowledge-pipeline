@@ -11,8 +11,8 @@ type: software
 version: "0.3.0"
 date-released: "2026-07-04"
 license: MIT
-repository-code: "https://github.com/shaowen-ye/project-knowledge-pipeline"
-url: "https://github.com/shaowen-ye/project-knowledge-pipeline/tree/main/foodweb-3d"
+repository-code: "https://github.com/shaowen-ye/foodweb-3d"
+url: "https://github.com/shaowen-ye/foodweb-3d"
 authors:
   - family-names: Ye
     given-names: Shaowen
