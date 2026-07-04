@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>食物网 3D · 三线投稿甘特图</title>
+<style>
+  :root { --bg:#06121a; --panel:#0b1c24; --border:#1b3540; --fg:#e8f1f2; --mut:#7d9aa3;
+    --l2:#38bec9; --l1:#ab8cff; --l3:#66bb6a; --done:#3a5561; --milestone:#f0a020; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); padding:24px;
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; }
+  h1 { font-size:17px; margin:0 0 3px; }
+  .sub { font-size:11.5px; color:var(--mut); margin-bottom:18px; line-height:1.6; max-width:900px; }
+  .chart { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:20px 18px 14px; max-width:1120px; overflow-x:auto; }
+  .axis { display:grid; margin-left:210px; border-bottom:1px solid var(--border); padding-bottom:4px; }
+  .axis span { font-size:10px; color:var(--mut); text-align:center; border-left:1px solid #12252d; }
+  .lane { margin-top:14px; }
+  .lane-title { font-size:12px; font-weight:700; margin-bottom:6px; display:flex; align-items:center; gap:7px; }
+  .lane-title i { width:11px; height:11px; border-radius:3px; display:inline-block; }
+  .row { display:flex; align-items:center; height:26px; }
+  .row .label { width:210px; flex:none; font-size:11px; color:var(--fg); padding-right:10px; text-align:right; }
+  .track { position:relative; flex:1; height:100%; }
+  .bar { position:absolute; top:5px; height:15px; border-radius:4px; font-size:9.5px; line-height:15px;
+    color:#04121a; padding:0 6px; white-space:nowrap; overflow:hidden; font-weight:600; }
+  .bar.done { background:var(--done); color:#c9d8dd; }
+  .bar.done::after { content:" ✓"; }
+  .mile { position:absolute; top:2px; width:0;height:0; }
+  .mile b { position:absolute; left:-7px; top:0; width:13px; height:13px; background:var(--milestone);
+    transform:rotate(45deg); border-radius:2px; }
+  .mile span { position:absolute; left:12px; top:-1px; font-size:9.5px; color:var(--milestone); white-space:nowrap; font-weight:700; }
+  .grid-lines { position:absolute; inset:0; pointer-events:none; }
+  .grid-lines i { position:absolute; top:0; bottom:0; width:1px; background:#12252d; }
+  .legend { display:flex; flex-wrap:wrap; gap:16px; font-size:11px; color:var(--mut); margin-top:16px; }
+  .legend i { width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-2px; }
+  .legend .dia { width:11px;height:11px;background:var(--milestone);transform:rotate(45deg);display:inline-block;margin-right:7px;vertical-align:0; }
+  .note { font-size:10px; color:var(--mut); margin-top:16px; line-height:1.6; max-width:1120px; }
+</style>
+</head>
+<body>
+<h1>食物网 3D · 三线投稿时间线 / Three-line submission gantt</h1>
+<div class="sub">相对月（M0=启动，无绝对日期）。实心=已完成，彩条=待推进，菱形=投稿里程碑。关键路径=线 3 真实数据获取。详见 <code>16-submission-timeline.md</code>。</div>
+
+<div class="chart">
+  <div class="axis" id="axis"></div>
+
+  <div class="lane">
+    <div class="lane-title"><i style="background:var(--l2)"></i>线 2 · 软件（→ MEE + JOSS）· 最快</div>
+    <div id="lane2"></div>
+  </div>
+  <div class="lane">
+    <div class="lane-title"><i style="background:var(--l1)"></i>线 1 · 理论（→ Ecology Letters / NEE）· 并行</div>
+    <div id="lane1"></div>
+  </div>
+  <div class="lane">
+    <div class="lane-title"><i style="background:var(--l3)"></i>线 3 · 大综合（→ GCB / PNAS）· 冲顶</div>
+    <div id="lane3"></div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--done)"></i>已完成</span>
+    <span><i style="background:var(--l2)"></i>线 2</span>
+    <span><i style="background:var(--l1)"></i>线 1</span>
+    <span><i style="background:var(--l3)"></i>线 3</span>
+    <span><b class="dia"></b>投稿里程碑</span>
+  </div>
+</div>
+
+<div class="note">调度：先投软件（~M3）拿可引用工具 → 并行完成理论（~M5）→ 数据到位后冲实证顶刊（~M12–14）。数据获取是唯一长杆，越早启动越好。已完成项见各线 checklist（<code>10/11/12</code>）。</div>
+
+<script>
+(function () {
+  var MONTHS = 15; // 0..14
+  var COL = { l2: '#38bec9', l1: '#ab8cff', l3: '#66bb6a' };
+  function pct(m) { return (m / (MONTHS - 1) * 100); }
+
+  // axis
+  var axis = document.getElementById('axis');
+  axis.style.gridTemplateColumns = 'repeat(' + MONTHS + ',1fr)';
+  for (var i = 0; i < MONTHS; i++) { var s = document.createElement('span'); s.textContent = 'M' + i; axis.appendChild(s); }
+
+  var tasks = {
+    lane2: [
+      { label: 'L2 规范 + 双适配器往返', s: 0, e: 0.2, done: true },
+      { label: '测试 + CI + 许可 + 引用', s: 0, e: 0.4, done: true },
+      { label: '独立仓库化 + v0.3.0 release', s: 0, e: 1 },
+      { label: '真实 R 端到端验证', s: 1, e: 2 },
+      { label: 'Zenodo DOI + JOSS 短文', s: 1, e: 2 },
+      { label: '图表 + 写作', s: 1, e: 3 },
+      { mile: 3, label: '投稿 MEE' }
+    ],
+    lane1: [
+      { label: '模块 + 相图 Fig 2/3', s: 0, e: 0.3, done: true },
+      { label: '向量场 Fig 4 + 边界条件', s: 0, e: 0.5, done: true },
+      { label: 'P*(α,σ) 闭式近似', s: 1, e: 2 },
+      { label: 'EDM/CCM 实证 Fig 5（需数据）', s: 2, e: 5 },
+      { label: '写作 + presubmission', s: 3, e: 5 },
+      { mile: 5.5, label: '投稿 Ecol. Lett.' }
+    ],
+    lane3: [
+      { label: '方向性综合 + 符号验证', s: 0, e: 0.3, done: true },
+      { label: '耦合 Fig 4–6', s: 0, e: 0.5, done: true },
+      { label: '真实多水体数据（关键路径）', s: 2, e: 8, crit: true },
+      { label: '定量 Fig 2/3 + 样本外技能', s: 6, e: 9 },
+      { label: '耦合真实内核验证', s: 6, e: 9 },
+      { label: '写作', s: 9, e: 12 },
+      { mile: 13, label: '投稿 GCB / PNAS' }
+    ]
+  };
+
+  function render(laneId, arr, col) {
+    var lane = document.getElementById(laneId);
+    arr.forEach(function (t) {
+      var row = document.createElement('div'); row.className = 'row';
+      var lab = document.createElement('div'); lab.className = 'label'; lab.textContent = t.label; row.appendChild(lab);
+      var track = document.createElement('div'); track.className = 'track';
+      // gridlines
+      var gl = document.createElement('div'); gl.className = 'grid-lines';
+      for (var i = 0; i < MONTHS; i++) { var g = document.createElement('i'); g.style.left = pct(i) + '%'; gl.appendChild(g); }
+      track.appendChild(gl);
+      if (t.mile != null) {
+        var mile = document.createElement('div'); mile.className = 'mile'; mile.style.left = pct(t.mile) + '%';
+        mile.innerHTML = '<b></b><span>' + t.label + '</span>'; track.appendChild(mile);
+        lab.textContent = '';
+      } else {
+        var bar = document.createElement('div'); bar.className = 'bar' + (t.done ? ' done' : '');
+        bar.style.left = pct(t.s) + '%'; bar.style.width = Math.max(pct(t.e) - pct(t.s), 1.5) + '%';
+        if (!t.done) bar.style.background = t.crit ? 'repeating-linear-gradient(45deg,' + col + ',' + col + ' 6px,#4a8a3a 6px,#4a8a3a 12px)' : col;
+        row.title = t.label + '  (M' + t.s + '–M' + t.e + ')';
+        track.appendChild(bar);
+      }
+      row.appendChild(track); lane.appendChild(row);
+    });
+  }
+  render('lane2', tasks.lane2, COL.l2);
+  render('lane1', tasks.lane1, COL.l1);
+  render('lane3', tasks.lane3, COL.l3);
+})();
+</script>
+</body>
+</html>
