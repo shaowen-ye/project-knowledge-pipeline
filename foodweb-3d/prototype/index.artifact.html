@@ -74,8 +74,13 @@
       <div><span>总生物量</span> <b id="m-tot">–</b></div>
     </div>
 
+    <h2>物理耦合 / Physics <span id="phys-anchor" style="font-weight:400;color:var(--mut);text-transform:none;letter-spacing:0"></span></h2>
+    <canvas id="physcanvas" width="278" height="188" style="width:100%;border:1px solid var(--border);border-radius:6px;background:#05171e"></canvas>
+    <div id="phys-readout" style="font-size:11px;color:var(--mut);margin-top:6px;line-height:1.6"></div>
+
     <h2>显示 / Display</h2>
     <label class="tog"><input type="checkbox" id="t-particles" checked> 能量粒子流</label>
+    <label class="tog"><input type="checkbox" id="t-phys" checked> 物理场 3D 提示（温度/补充脉冲）</label>
     <label class="tog"><input type="checkbox" id="t-inter" checked> 跨-patch 补给弧（meta-生态系统）</label>
     <label class="tog"><input type="checkbox" id="t-uncertainty"> 不确定性壳层（±CV）</label>
     <label class="tog"><input type="checkbox" id="t-labels" checked> 节点标签</label>
@@ -1153,7 +1158,7 @@ window.FOODWEB_DATA = {
     "title_en": "Yangtze 3-patch meta-ecosystem food web (illustrative)",
     "note_zh": "合成/示意数据，量级参照文献，非实测。演示 L2 交换格式。",
     "note_en": "Synthetic illustrative data (orders of magnitude from literature), not measured. Demonstrates the L2 interchange schema.",
-    "schema_version": "0.1",
+    "schema_version": "0.2",
     "months": 120,
     "engine": {
       "gain": 0.11,
@@ -1162,6 +1167,30 @@ window.FOODWEB_DATA = {
       "selfDampConsumer": 0.20,
       "assimilation": 0.6,
       "dt": 0.05
+    },
+    "provenance": {
+      "forcing_zh": "物理强迫为真实/公开数据：三峡水库水位调度曲线（正常蓄水位 175 m，防洪限制水位约 145 m，汛期消落、9–10 月蓄水）与长江中游月均水温气候态（约 11–28 ℃）。数值为代表性近似，非某一年逐日实测。",
+      "forcing_en": "Physical forcing uses real/published data: the Three Gorges Reservoir water-level operation curve (normal pool 175 m, flood-limit ~145 m, drawdown then Sep–Oct refill) and middle-Yangtze monthly water-temperature climatology (~11–28 °C). Values are representative approximations, not a specific measured daily series.",
+      "trophic_zh": "食物网结构与生物量量级参照已发表的长江中游 / 三峡库区 Ecopath 模型（见 ../08-references.md），为文献一致的合成参数化，非单一实测配平。",
+      "trophic_en": "Food-web structure and biomass magnitudes follow published middle-Yangtze / Three Gorges Ecopath models (see ../08-references.md); a literature-consistent synthetic parameterization, not a single measured balance."
+    }
+  },
+  "physics": {
+    "anchor_zh": "三峡库区（干流库段）",
+    "anchor_en": "Three Gorges Reservoir mainstem",
+    "waterLevel_m":  [173, 168, 162, 156, 150, 146, 146, 148, 156, 168, 175, 174],
+    "waterLevel_note": "月代表值 / monthly representative (m). 175=正常蓄水位, 145=防洪限制水位.",
+    "temp_c":        [11, 11.5, 14, 18, 22, 25, 27.5, 28, 25, 21, 16.5, 13],
+    "temp_note": "长江中游表层月均水温气候态 / middle-Yangtze surface water-temperature climatology (°C).",
+    "spawnTempThreshold_c": 18,
+    "dispatchPeakMonth": 5,
+    "coupling": {
+      "q10": 2.3, "tRef": 20,
+      "tempPhotoStrength": 0.7,
+      "lightSelfShade": 0.6,
+      "stratSummerMonths": [6, 7, 8],
+      "drawdownSubsidyStrength": 0.5,
+      "clarityRefPhyto": 30
     }
   },
   "patches": [
@@ -1223,16 +1252,108 @@ window.FOODWEB_DATA = {
       "desc_zh": "持续注入鲢鳙；容量约束下总生物量未必等比上升（间接负效应）。", "desc_en": "Sustained silver/bighead injection; carrying-capacity limits net gain (indirect negative effects).",
       "stocking": { "silvercarp": 3.0, "bighead": 2.0 } },
     { "id": "dispatch", "name_zh": "生态调度", "name_en": "Ecological dispatch",
-      "desc_zh": "春季人工洪峰→四大家鱼补充脉冲。", "desc_en": "Spring flood pulse → recruitment pulse for the four major carps.",
-      "spawnPulse": { "amp": 0.55, "peakMonth": 4, "carp4": true } },
+      "desc_zh": "5 月人工洪峰，与自然水温产卵信号（≥18℃）对齐→四大家鱼补充脉冲。", "desc_en": "May engineered flood pulse aligned with the natural ≥18°C spawning cue → recruitment pulse for the four major carps.",
+      "dispatch": true },
     { "id": "warming", "name_zh": "气候增温", "name_en": "Climate warming",
-      "desc_zh": "物候前移，产卵信号与固定调度错配→补充收益被抵消；浮游机制转换。", "desc_en": "Phenology advance; spawning cue decouples from fixed dispatch → recruitment benefit cancelled; plankton regime shift.",
-      "spawnPulse": { "amp": 0.55, "peakMonth": 4, "carp4": true }, "phenologyShiftMonths": 2, "planktonPress": -0.10 },
+      "desc_zh": "水温 +3℃，产卵信号提前，与固定 5 月调度错配→补充收益被抵消（涌现式解耦）；夏季分层增强。", "desc_en": "+3°C: the ≥18°C spawning cue advances and decouples from the fixed May dispatch → recruitment benefit is cancelled (emergent decoupling); stronger summer stratification.",
+      "dispatch": true, "tempDelta": 3, "stratBoost": 0.4 },
     { "id": "invasion", "name_zh": "外来种入侵", "name_en": "Invasive species",
       "desc_zh": "引种银鱼与浮游动物/鲢竞争，能量传递效率下降，网络脆弱化。", "desc_en": "Introduced icefish competes with zooplankton/silver carp; transfer efficiency drops, web simplifies.",
       "press": { "zooplankton": -0.14, "silvercarp": -0.10 } }
   ]
 };
+
+</script>
+<script>
+/*
+ * L1b 物理层 / Physics layer — 真实强迫的 1D 水库物理
+ * Real-forcing 1D reservoir physics for Three Gorges Reservoir.
+ *
+ * 强迫为真实/公开数据：三峡水位调度曲线 + 长江中游水温气候态（见 data.physics）。
+ * 输出逐月：水位、水温、分层指数、消落带再淹没补给脉冲、产卵信号就绪度、调度洪峰。
+ * 产卵信号 = 水温跨越 18℃（自然线索）× 调度洪峰（工程线索）的重叠 —— 增温使二者解耦。
+ *
+ * Works in the browser (window.FoodwebPhysics) and in Node.
+ */
+(function (root) {
+  'use strict';
+
+  function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  // linear interpolation of a 12-month climatology at fractional month t
+  function climo(arr, tMonth, delta) {
+    const m = ((tMonth % 12) + 12) % 12;
+    const i = Math.floor(m), f = m - i;
+    const v = arr[i] * (1 - f) + arr[(i + 1) % 12] * f;
+    return v + (delta || 0);
+  }
+
+  // month (fractional) at which spring temperature first crosses the spawning threshold
+  function tempCrossMonth(P, delta) {
+    const thr = P.spawnTempThreshold_c;
+    for (let m = 0; m <= 7; m += 0.05) {
+      if (climo(P.temp_c, m, delta) >= thr) return m;
+    }
+    return 4; // fallback
+  }
+
+  // Build per-month physics series for a scenario.
+  function series(data, scen) {
+    const P = data.physics;
+    const months = data.meta.months;
+    const tempDelta = (scen && scen.tempDelta) || 0;
+    const stratBoost = (scen && scen.stratBoost) || 0;
+    const dispatchOn = !!(scen && scen.dispatch);
+    const thr = P.spawnTempThreshold_c;
+    const dispatchPeak = P.dispatchPeakMonth;   // 1-based (5 = May)
+    const stratMonths = P.coupling.stratSummerMonths;
+
+    // biological spawning readiness is a PULSE centered on the 18°C crossing;
+    // warming advances this crossing → it drifts away from the fixed May dispatch.
+    const bioPeak = tempCrossMonth(P, tempDelta);          // 0-based fractional month
+    const dispatchPeak0 = dispatchPeak - 1;                // 0-based
+
+    const out = [];
+    for (let t = 0; t <= months; t++) {
+      const temp = climo(P.temp_c, t, tempDelta);
+      const wl = climo(P.waterLevel_m, t);
+      const dWL = wl - climo(P.waterLevel_m, t - 1);
+      const moY = ((t % 12) + 12) % 12;
+
+      // summer thermal stratification (0..1)
+      let strat = 0;
+      stratMonths.forEach(sm => { strat = Math.max(strat, gauss(moY, sm, 1.4)); });
+      strat = clamp01(strat + (moY >= 5 && moY <= 8 ? stratBoost : 0));
+
+      // drawdown-zone re-inundation subsidy: pulse when water level rises after the
+      // summer low (re-floods the exposed 消落带, releasing organic matter/nutrients)
+      const drawdownPulse = clamp01(dWL / 8) * clamp01((175 - wl) / 25);
+
+      // biological readiness pulse (spring, at the temperature crossing)
+      const bioReady = gauss(moY, bioPeak, 1.0);
+      // spring water-rise flood: the reservoir DRAWS DOWN in spring (dWL<0), so the
+      // natural spring flood cue is nearly absent — ecological dispatch restores it.
+      const naturalRise = clamp01(dWL / 5) * gauss(moY, 4, 2.2);
+      const dispatchPulse = dispatchOn ? gauss(moY, dispatchPeak0, 0.9) : 0;
+      const tempReady = 1 / (1 + Math.exp(-(temp - thr) * 1.2));
+
+      out.push({ t, temp, wl, dWL, strat, drawdownPulse, tempReady, bioReady, naturalRise, dispatchPulse });
+    }
+    return out;
+  }
+
+  function gauss(x, mu, s) { const d = x - mu; return Math.exp(-(d * d) / (2 * s * s)); }
+
+  // recruitment for the four major carps: biological readiness pulse × available spring
+  // flood (engineered dispatch, or the near-absent natural spring rise in the reservoir).
+  function recruitment(phys, dispatchOn) {
+    const flood = dispatchOn ? Math.max(phys.dispatchPulse, phys.naturalRise) : phys.naturalRise;
+    return phys.bioReady * flood;
+  }
+
+  const api = { series, recruitment, climo };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.FoodwebPhysics = api;
+})(typeof window !== 'undefined' ? window : this);
 
 </script>
 <script>
@@ -1350,8 +1471,28 @@ window.FOODWEB_DATA = {
     return Math.exp(-(d * d) / (2 * sigma * sigma));
   }
 
+  // resolve the physics layer (optional two-way coupling)
+  function getPhysics(root) {
+    if (typeof module !== 'undefined' && module.exports) { try { return require('./physics.js'); } catch (e) { return null; } }
+    return root.FoodwebPhysics || null;
+  }
+
+  // linear interpolation of a physics series (per-month) at fractional month t
+  function physAt(seriesArr, t) {
+    if (!seriesArr) return null;
+    const i = Math.floor(t), f = t - i;
+    const a = seriesArr[Math.min(i, seriesArr.length - 1)];
+    const b = seriesArr[Math.min(i + 1, seriesArr.length - 1)];
+    const L = (k) => a[k] + (b[k] - a[k]) * f;
+    return {
+      temp: L('temp'), wl: L('wl'), strat: L('strat'),
+      drawdownPulse: L('drawdownPulse'), tempReady: L('tempReady'),
+      bioReady: L('bioReady'), naturalRise: L('naturalRise'), dispatchPulse: L('dispatchPulse')
+    };
+  }
+
   // Integrate one scenario; return per-month snapshots of biomass, flux, metrics.
-  function simulate(model, scenId) {
+  function simulate(model, scenId, rootRef) {
     const scen = (model.data.scenarios || []).find(s => s.id === scenId) || null;
     const n = model.n, A = model.A, r0 = model.r0, p = model.p;
     const months = model.data.meta.months;
@@ -1360,6 +1501,17 @@ window.FOODWEB_DATA = {
     const B = model.B0.slice();
     const cap = model.B0.map(b => b * 6 + 5); // upper clamp to keep the demo bounded
 
+    // ---- physics coupling setup ----
+    const PHYS = getPhysics(rootRef || (typeof window !== 'undefined' ? window : this));
+    const phys = model.data.physics;
+    const physSeries = (PHYS && phys) ? PHYS.series(model.data, scen) : null;
+    const dispatchOn = !!(scen && scen.dispatch);
+    const cpl = phys ? phys.coupling : null;
+    const producers = model.groups.map(g => g.type === 'producer');
+    const iPhyto = model.idx.phyto;
+    const subsidyTargets = ['detritus', 'periphyton'].map(id => model.idx[id]).filter(x => x != null);
+    const gProd = model.groups.map((g, i) => producers[i] ? Math.max(r0[i], 0.4) : 0);
+
     const frames = [];
     let stepInFrame = 0;
     const framesPerMonth = Math.round(1 / dt);
@@ -1367,10 +1519,30 @@ window.FOODWEB_DATA = {
     for (let s = 0; s <= steps; s++) {
       const t = s * dt;
       const f = scenarioForcing(model, scen, t);
-      // dB_i = B_i * ( r0_i + dR_i + Σ_j A_ij B_j ) + immig_i
+
+      // ---- physics → biology coupling (two-way; clarity feeds back via B[phyto]) ----
+      const ph = physSeries ? physAt(physSeries, t) : null;
+      const dRphys = new Array(n).fill(0);
+      let lightMult = 1, clarity = 1, recr = 0;
+      if (ph && cpl) {
+        const photo = Math.pow(cpl.q10, (ph.temp - cpl.tRef) / 10);     // temperature on photosynthesis
+        const phytoB = iPhyto != null ? B[iPhyto] : 0;
+        clarity = cpl.clarityRefPhyto / (cpl.clarityRefPhyto + phytoB);  // 0..1, high when water is clear
+        const light = 1 - cpl.lightSelfShade * (1 - clarity);           // self-shading (turbidity)
+        lightMult = 1 + cpl.tempPhotoStrength * (photo * light * (1 - 0.15 * ph.strat) - 1);
+        // producers respond to temperature + light
+        for (let i = 0; i < n; i++) if (producers[i]) dRphys[i] += gProd[i] * (lightMult - 1);
+        // drawdown-zone re-inundation subsidy
+        subsidyTargets.forEach(i => { dRphys[i] += cpl.drawdownSubsidyStrength * ph.drawdownPulse; });
+        // four-major-carp recruitment from spawning-cue × flood-pulse overlap
+        recr = PHYS.recruitment(ph, dispatchOn);
+        for (let i = 0; i < n; i++) if (model.groups[i].carp4) dRphys[i] += 1.0 * recr;
+      }
+
+      // dB_i = B_i * ( r0_i + dR_i + dRphys_i + Σ_j A_ij B_j ) + immig_i
       const dB = new Array(n);
       for (let i = 0; i < n; i++) {
-        let interaction = r0[i] + f.dR[i];
+        let interaction = r0[i] + f.dR[i] + dRphys[i];
         const Ai = A[i];
         for (let j = 0; j < n; j++) interaction += Ai[j] * B[j];
         dB[i] = B[i] * interaction + f.immig[i];
@@ -1382,15 +1554,15 @@ window.FOODWEB_DATA = {
       }
 
       if (s % framesPerMonth === 0) {
-        frames.push(snapshot(model, B, scen, t));
+        frames.push(snapshot(model, B, scen, t, ph, clarity, recr));
         stepInFrame = 0;
       }
       stepInFrame++;
     }
-    return { scenarioId: scenId, months, frames };
+    return { scenarioId: scenId, months, frames, hasPhysics: !!physSeries };
   }
 
-  function snapshot(model, B, scen, t) {
+  function snapshot(model, B, scen, t, ph, clarity, recr) {
     const n = model.n, p = model.p;
     // fluxes on each trophic link: consumption of prey by predator
     const flux = model.links.map(l => {
@@ -1412,10 +1584,18 @@ window.FOODWEB_DATA = {
     const active = flux.filter(x => x > tst * 0.005).length;
     const connectance = active / (n * n);
 
+    const iPhyto = model.idx.phyto;
     return {
       t: t,
       B: B.slice(),
       flux: flux,
+      phys: ph ? {
+        temp: ph.temp, wl: ph.wl, strat: ph.strat,
+        drawdownPulse: ph.drawdownPulse, dispatchPulse: ph.dispatchPulse,
+        tempReady: ph.tempReady, recruitment: recr || 0,
+        chlA: iPhyto != null ? B[iPhyto] : 0,
+        clarity: clarity != null ? clarity : 1
+      } : null,
       metrics: {
         tst: tst,
         connectance: connectance,
@@ -1605,14 +1785,14 @@ window.FOODWEB_DATA = {
       const mesh = new THREE.Mesh(geo, mat);
       interGroup.add(mesh);
       interGroup.add(makeLabel(THREE, ie.type_zh, midp.clone(), 0xf0a020, 18));
-      interArcs.push(mesh);
+      interArcs.push({ mesh: mesh, drawdown: /drawdown/.test(ie.type_en) });
     });
     scene.add(interGroup);
 
     // ---- per-frame state ---------------------------------------------------
     const viz = {
       frames: null, frameCount: 0, month: 0, playing: false, speed: 0.6,
-      opts: { uncertainty: false, interEdges: true, particles: true, labels: true },
+      opts: { uncertainty: false, interEdges: true, particles: true, labels: true, phys: true },
       _maxFlux: 1, _t: 0, onMonth: null
     };
 
@@ -1639,11 +1819,22 @@ window.FOODWEB_DATA = {
     function applyFrame() {
       if (!viz.frames) return;
       const fr = currentFrame();
+      // physics 3D cues: temperature tint + carp recruitment glow + drawdown arc pulse
+      const ph = fr.phys;
+      if (ph && viz.opts.phys) {
+        const warm = Math.max(0, Math.min((ph.temp - 10) / 18, 1)); // 0 cold .. 1 warm
+        const bg = new THREE.Color(0x06121a).lerp(new THREE.Color(0x14202a), warm);
+        scene.background = bg; scene.fog.color = bg;
+      } else {
+        scene.background = new THREE.Color(0x06121a); scene.fog.color = new THREE.Color(0x06121a);
+      }
+      const recrGlow = (ph && viz.opts.phys) ? Math.min(ph.recruitment * 1.6, 1) : 0;
       // nodes
       data.groups.forEach((g, i) => {
         const B = fr.B[i];
         const r = 0.9 + Math.cbrt(B) * 0.85;
         nodeMeshes[i].scale.setScalar(r);
+        nodeMeshes[i].material.emissiveIntensity = (g.carp4 ? 0.15 + recrGlow * 0.8 : 0.15);
         const shell = shellMeshes[i];
         shell.visible = viz.opts.uncertainty;
         shell.scale.setScalar(r * (1 + (g.cv || 0.3)));
@@ -1658,6 +1849,9 @@ window.FOODWEB_DATA = {
         e.mesh.material.opacity = 0.25 + 0.5 * (f / viz._maxFlux);
       });
       interGroup.visible = viz.opts.interEdges;
+      // pulse the drawdown-zone subsidy arc with the re-inundation signal
+      const dd = (ph && viz.opts.phys) ? ph.drawdownPulse : 0;
+      interArcs.forEach(a => { a.mesh.material.opacity = a.drawdown ? 0.4 + 0.55 * dd : 0.55; });
       points.visible = viz.opts.particles;
     }
 
@@ -1760,6 +1954,10 @@ window.FOODWEB_DATA = {
     let currentScen = 'baseline';
     viz.loadScenario(results[currentScen]);
 
+    // physics anchor label
+    if (data.physics) document.getElementById('phys-anchor').textContent = '· ' + data.physics.anchor_zh;
+    const physCanvas = document.getElementById('physcanvas');
+
     // ----- scenario buttons -----
     const scenWrap = document.getElementById('scenarios');
     data.scenarios.forEach(s => {
@@ -1805,6 +2003,7 @@ window.FOODWEB_DATA = {
     bindToggle('t-uncertainty', v => { viz.opts.uncertainty = v; viz.setMonth(viz.month); });
     bindToggle('t-inter', v => { viz.opts.interEdges = v; viz.setMonth(viz.month); });
     bindToggle('t-particles', v => { viz.opts.particles = v; });
+    bindToggle('t-phys', v => { viz.opts.phys = v; viz.setMonth(viz.month); });
     bindToggle('t-labels', v => { viz.opts.labels = v; viz.setMonth(viz.month); });
 
     function bindToggle(id, fn) {
@@ -1826,6 +2025,92 @@ window.FOODWEB_DATA = {
       document.getElementById('m-conn').textContent = m.connectance.toFixed(3);
       document.getElementById('m-te').textContent = m.transferEff.toFixed(3);
       document.getElementById('m-tot').textContent = m.totalBiomass.toFixed(1);
+      drawPhysics();
+    }
+
+    // ----- physics panel: reservoir cross-section + time series -----
+    function drawPhysics() {
+      if (!data.physics) return;
+      const frames = results[currentScen].frames;
+      const mi = Math.round(viz.month);
+      const fr = frames[Math.min(mi, frames.length - 1)];
+      if (!fr || !fr.phys) return;
+      const ctx = physCanvas.getContext('2d');
+      const W = physCanvas.width, H = physCanvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // --- top: reservoir cross-section (0..96) ---
+      const secH = 96, pad = 6;
+      const WLmin = 145, WLmax = 176;
+      const basinTop = 12, basinBot = secH - 14;
+      const damX = W - 22;
+      const wlY = v => basinBot - (v - WLmin) / (WLmax - WLmin) * (basinBot - basinTop);
+      // basin walls
+      ctx.strokeStyle = '#3a5561'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(pad, basinTop); ctx.lineTo(pad + 18, basinBot); ctx.lineTo(damX, basinBot);
+      ctx.lineTo(damX, basinTop); ctx.stroke();
+      // fluctuation zone (145..175) faint
+      ctx.fillStyle = 'rgba(180,120,70,0.10)';
+      ctx.fillRect(pad + 18, wlY(WLmax), damX - pad - 18, wlY(WLmin) - wlY(WLmax));
+      // water body, tinted by chl-a (greener when eutrophic)
+      const chl = fr.phys.chlA, green = Math.min(chl / 45, 1);
+      const surfY = wlY(fr.phys.wl);
+      const grad = ctx.createLinearGradient(0, surfY, 0, basinBot);
+      grad.addColorStop(0, 'rgba(' + (30 + green * 90) + ',' + (150 + green * 60) + ',' + (200 - green * 70) + ',0.85)');
+      grad.addColorStop(1, 'rgba(10,40,70,0.9)');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.moveTo(pad + (surfY <= basinBot ? (basinBot - surfY) / (basinBot - basinTop) * 18 : 18), surfY);
+      ctx.lineTo(damX, surfY); ctx.lineTo(damX, basinBot); ctx.lineTo(pad + 18, basinBot); ctx.closePath(); ctx.fill();
+      // drawdown exposed band (above surface, within fluctuation zone)
+      if (fr.phys.wl < WLmax - 1) {
+        ctx.fillStyle = 'rgba(180,120,70,0.35)';
+        ctx.fillRect(pad + 18, wlY(WLmax), damX - pad - 18, surfY - wlY(WLmax));
+      }
+      // thermocline in summer
+      if (fr.phys.strat > 0.4) {
+        const thY = surfY + (basinBot - surfY) * 0.42;
+        ctx.strokeStyle = 'rgba(255,200,80,' + (0.3 + fr.phys.strat * 0.5) + ')'; ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(pad + 18, thY); ctx.lineTo(damX, thY); ctx.stroke(); ctx.setLineDash([]);
+      }
+      // dam
+      ctx.fillStyle = '#59707a'; ctx.fillRect(damX, basinTop - 2, 8, basinBot - basinTop + 4);
+      // labels
+      ctx.fillStyle = '#9fb8c0'; ctx.font = '9px sans-serif'; ctx.textBaseline = 'alphabetic';
+      ctx.fillText('175', damX - 20, wlY(175) - 1); ctx.fillText('145', damX - 20, wlY(145) - 1);
+      ctx.fillStyle = '#e8f1f2'; ctx.font = '10px sans-serif';
+      ctx.fillText('水位 ' + fr.phys.wl.toFixed(0) + ' m', pad + 20, basinTop + 9);
+      ctx.fillText('水温 ' + fr.phys.temp.toFixed(1) + '℃', pad + 20, basinTop + 21);
+
+      // --- bottom: time-series sparklines (96..188) ---
+      const traces = [
+        { key: 'wl', lo: 144, hi: 176, col: '#38bec9', name: '水位' },
+        { key: 'temp', lo: 8, hi: 31, col: '#ff9f40', name: '水温' },
+        { key: 'chlA', lo: 10, hi: 45, col: '#66bb6a', name: '叶绿素a' },
+        { key: 'recruitment', lo: 0, hi: 0.7, col: '#e15b97', name: '家鱼补充' }
+      ];
+      const rowH = (H - secH - 4) / traces.length;
+      traces.forEach((tr, ti) => {
+        const y0 = secH + 4 + ti * rowH, y1 = y0 + rowH - 3;
+        ctx.strokeStyle = tr.col; ctx.lineWidth = 1; ctx.beginPath();
+        frames.forEach((f, k) => {
+          const v = f.phys ? f.phys[tr.key] : 0;
+          const x = pad + (k / (frames.length - 1)) * (W - pad * 2);
+          const yy = y1 - ((v - tr.lo) / (tr.hi - tr.lo)) * (rowH - 4);
+          k === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy);
+        });
+        ctx.stroke();
+        ctx.fillStyle = tr.col; ctx.font = '8px sans-serif';
+        ctx.fillText(tr.name, pad + 1, y0 + 7);
+      });
+      // playhead
+      const phx = pad + (mi / (frames.length - 1)) * (W - pad * 2);
+      ctx.strokeStyle = 'rgba(230,241,242,0.5)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(phx, secH + 2); ctx.lineTo(phx, H); ctx.stroke();
+
+      // readout line
+      document.getElementById('phys-readout').innerHTML =
+        '叶绿素a <b style="color:#66bb6a">' + fr.phys.chlA.toFixed(1) + '</b> · 透明度 <b>' + fr.phys.clarity.toFixed(2) +
+        '</b> · 家鱼补充 <b style="color:#e15b97">' + fr.phys.recruitment.toFixed(2) + '</b>';
     }
 
     // ----- legend -----

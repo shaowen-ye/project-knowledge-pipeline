@@ -36,7 +36,9 @@
 | [06-framework-design.md](06-framework-design.md) | 拟建统一框架设计 | 引擎层-交换格式-3D 渲染层 + 情景引擎 |
 | [07-roadmap.md](07-roadmap.md) | 研发+发表路线图 | 阶段 0→3，三条论文线，里程碑与风险 |
 | [08-references.md](08-references.md) | 合并参考文献 | 按主题分组，带 DOI 与核实状态 |
-| [DECISIONS.md](DECISIONS.md) | 决策日志 | 范围与方法决策的不可变记录 |
+| [09-phase2-coupling.md](09-phase2-coupling.md) | 阶段 2：真实强迫+物理耦合 | 三峡锚定，物理↔营养双向耦合，涌现式调度-信号解耦 |
+| [prototype/](prototype/) | 阶段 1–2 可运行原型 | three.js 3D 交互 + 物理耦合（`prototype/README.md`） |
+| [DECISIONS.md](DECISIONS.md) | 决策日志 | 范围与方法决策的不可变记录（D-001…D-005） |
 
 **阅读顺序建议**：初次通读按 `01 → 02 → 03 → 04 → 05 → 06 → 07`；只关心"我该做什么"看 `06`+`07`；只关心"别人做到哪了"看 `01`+`02`+`03`。
 

@@ -168,14 +168,14 @@
       const mesh = new THREE.Mesh(geo, mat);
       interGroup.add(mesh);
       interGroup.add(makeLabel(THREE, ie.type_zh, midp.clone(), 0xf0a020, 18));
-      interArcs.push(mesh);
+      interArcs.push({ mesh: mesh, drawdown: /drawdown/.test(ie.type_en) });
     });
     scene.add(interGroup);
 
     // ---- per-frame state ---------------------------------------------------
     const viz = {
       frames: null, frameCount: 0, month: 0, playing: false, speed: 0.6,
-      opts: { uncertainty: false, interEdges: true, particles: true, labels: true },
+      opts: { uncertainty: false, interEdges: true, particles: true, labels: true, phys: true },
       _maxFlux: 1, _t: 0, onMonth: null
     };
 
@@ -202,11 +202,22 @@
     function applyFrame() {
       if (!viz.frames) return;
       const fr = currentFrame();
+      // physics 3D cues: temperature tint + carp recruitment glow + drawdown arc pulse
+      const ph = fr.phys;
+      if (ph && viz.opts.phys) {
+        const warm = Math.max(0, Math.min((ph.temp - 10) / 18, 1)); // 0 cold .. 1 warm
+        const bg = new THREE.Color(0x06121a).lerp(new THREE.Color(0x14202a), warm);
+        scene.background = bg; scene.fog.color = bg;
+      } else {
+        scene.background = new THREE.Color(0x06121a); scene.fog.color = new THREE.Color(0x06121a);
+      }
+      const recrGlow = (ph && viz.opts.phys) ? Math.min(ph.recruitment * 1.6, 1) : 0;
       // nodes
       data.groups.forEach((g, i) => {
         const B = fr.B[i];
         const r = 0.9 + Math.cbrt(B) * 0.85;
         nodeMeshes[i].scale.setScalar(r);
+        nodeMeshes[i].material.emissiveIntensity = (g.carp4 ? 0.15 + recrGlow * 0.8 : 0.15);
         const shell = shellMeshes[i];
         shell.visible = viz.opts.uncertainty;
         shell.scale.setScalar(r * (1 + (g.cv || 0.3)));
@@ -221,6 +232,9 @@
         e.mesh.material.opacity = 0.25 + 0.5 * (f / viz._maxFlux);
       });
       interGroup.visible = viz.opts.interEdges;
+      // pulse the drawdown-zone subsidy arc with the re-inundation signal
+      const dd = (ph && viz.opts.phys) ? ph.drawdownPulse : 0;
+      interArcs.forEach(a => { a.mesh.material.opacity = a.drawdown ? 0.4 + 0.55 * dd : 0.55; });
       points.visible = viz.opts.particles;
     }
 

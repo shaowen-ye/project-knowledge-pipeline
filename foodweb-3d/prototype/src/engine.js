@@ -112,8 +112,28 @@
     return Math.exp(-(d * d) / (2 * sigma * sigma));
   }
 
+  // resolve the physics layer (optional two-way coupling)
+  function getPhysics(root) {
+    if (typeof module !== 'undefined' && module.exports) { try { return require('./physics.js'); } catch (e) { return null; } }
+    return root.FoodwebPhysics || null;
+  }
+
+  // linear interpolation of a physics series (per-month) at fractional month t
+  function physAt(seriesArr, t) {
+    if (!seriesArr) return null;
+    const i = Math.floor(t), f = t - i;
+    const a = seriesArr[Math.min(i, seriesArr.length - 1)];
+    const b = seriesArr[Math.min(i + 1, seriesArr.length - 1)];
+    const L = (k) => a[k] + (b[k] - a[k]) * f;
+    return {
+      temp: L('temp'), wl: L('wl'), strat: L('strat'),
+      drawdownPulse: L('drawdownPulse'), tempReady: L('tempReady'),
+      bioReady: L('bioReady'), naturalRise: L('naturalRise'), dispatchPulse: L('dispatchPulse')
+    };
+  }
+
   // Integrate one scenario; return per-month snapshots of biomass, flux, metrics.
-  function simulate(model, scenId) {
+  function simulate(model, scenId, rootRef) {
     const scen = (model.data.scenarios || []).find(s => s.id === scenId) || null;
     const n = model.n, A = model.A, r0 = model.r0, p = model.p;
     const months = model.data.meta.months;
@@ -122,6 +142,17 @@
     const B = model.B0.slice();
     const cap = model.B0.map(b => b * 6 + 5); // upper clamp to keep the demo bounded
 
+    // ---- physics coupling setup ----
+    const PHYS = getPhysics(rootRef || (typeof window !== 'undefined' ? window : this));
+    const phys = model.data.physics;
+    const physSeries = (PHYS && phys) ? PHYS.series(model.data, scen) : null;
+    const dispatchOn = !!(scen && scen.dispatch);
+    const cpl = phys ? phys.coupling : null;
+    const producers = model.groups.map(g => g.type === 'producer');
+    const iPhyto = model.idx.phyto;
+    const subsidyTargets = ['detritus', 'periphyton'].map(id => model.idx[id]).filter(x => x != null);
+    const gProd = model.groups.map((g, i) => producers[i] ? Math.max(r0[i], 0.4) : 0);
+
     const frames = [];
     let stepInFrame = 0;
     const framesPerMonth = Math.round(1 / dt);
@@ -129,10 +160,30 @@
     for (let s = 0; s <= steps; s++) {
       const t = s * dt;
       const f = scenarioForcing(model, scen, t);
-      // dB_i = B_i * ( r0_i + dR_i + Σ_j A_ij B_j ) + immig_i
+
+      // ---- physics → biology coupling (two-way; clarity feeds back via B[phyto]) ----
+      const ph = physSeries ? physAt(physSeries, t) : null;
+      const dRphys = new Array(n).fill(0);
+      let lightMult = 1, clarity = 1, recr = 0;
+      if (ph && cpl) {
+        const photo = Math.pow(cpl.q10, (ph.temp - cpl.tRef) / 10);     // temperature on photosynthesis
+        const phytoB = iPhyto != null ? B[iPhyto] : 0;
+        clarity = cpl.clarityRefPhyto / (cpl.clarityRefPhyto + phytoB);  // 0..1, high when water is clear
+        const light = 1 - cpl.lightSelfShade * (1 - clarity);           // self-shading (turbidity)
+        lightMult = 1 + cpl.tempPhotoStrength * (photo * light * (1 - 0.15 * ph.strat) - 1);
+        // producers respond to temperature + light
+        for (let i = 0; i < n; i++) if (producers[i]) dRphys[i] += gProd[i] * (lightMult - 1);
+        // drawdown-zone re-inundation subsidy
+        subsidyTargets.forEach(i => { dRphys[i] += cpl.drawdownSubsidyStrength * ph.drawdownPulse; });
+        // four-major-carp recruitment from spawning-cue × flood-pulse overlap
+        recr = PHYS.recruitment(ph, dispatchOn);
+        for (let i = 0; i < n; i++) if (model.groups[i].carp4) dRphys[i] += 1.0 * recr;
+      }
+
+      // dB_i = B_i * ( r0_i + dR_i + dRphys_i + Σ_j A_ij B_j ) + immig_i
       const dB = new Array(n);
       for (let i = 0; i < n; i++) {
-        let interaction = r0[i] + f.dR[i];
+        let interaction = r0[i] + f.dR[i] + dRphys[i];
         const Ai = A[i];
         for (let j = 0; j < n; j++) interaction += Ai[j] * B[j];
         dB[i] = B[i] * interaction + f.immig[i];
@@ -144,15 +195,15 @@
       }
 
       if (s % framesPerMonth === 0) {
-        frames.push(snapshot(model, B, scen, t));
+        frames.push(snapshot(model, B, scen, t, ph, clarity, recr));
         stepInFrame = 0;
       }
       stepInFrame++;
     }
-    return { scenarioId: scenId, months, frames };
+    return { scenarioId: scenId, months, frames, hasPhysics: !!physSeries };
   }
 
-  function snapshot(model, B, scen, t) {
+  function snapshot(model, B, scen, t, ph, clarity, recr) {
     const n = model.n, p = model.p;
     // fluxes on each trophic link: consumption of prey by predator
     const flux = model.links.map(l => {
@@ -174,10 +225,18 @@
     const active = flux.filter(x => x > tst * 0.005).length;
     const connectance = active / (n * n);
 
+    const iPhyto = model.idx.phyto;
     return {
       t: t,
       B: B.slice(),
       flux: flux,
+      phys: ph ? {
+        temp: ph.temp, wl: ph.wl, strat: ph.strat,
+        drawdownPulse: ph.drawdownPulse, dispatchPulse: ph.dispatchPulse,
+        tempReady: ph.tempReady, recruitment: recr || 0,
+        chlA: iPhyto != null ? B[iPhyto] : 0,
+        clarity: clarity != null ? clarity : 1
+      } : null,
       metrics: {
         tst: tst,
         connectance: connectance,

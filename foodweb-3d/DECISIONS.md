@@ -30,6 +30,8 @@
 | D-001 | 2026-07-04 | 阶段 0 范围：交付物/锚定系统/顶刊定位/语言 | process | ✅ Accepted |
 | D-002 | 2026-07-04 | 阶段 1 原型技术选型（L3 three.js / L2 JSON / L1 纯 JS） | tooling | ✅ Accepted |
 | D-003 | 2026-07-04 | 阶段 1 旗舰=3-patch 长江 meta 系统（示意级） | data | ✅ Accepted |
+| D-004 | 2026-07-04 | 阶段 2 物理↔营养双向耦合（降阶物理 + 真实强迫） | methodology | ✅ Accepted |
+| D-005 | 2026-07-04 | 阶段 2 物理锚定=三峡库区（真实调度曲线+水温气候态） | data | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -167,6 +169,91 @@ L3 = **three.js r128 UMD**（暴露 `window.THREE`，全内联，CSP 友好）+ 
 
 - Code: `prototype/src/{engine,render,ui}.js`, `prototype/index.html`, `prototype/index.artifact.html`, `prototype/vendor/`
 - Related decisions: D-001, D-003
+
+---
+
+### D-005 阶段 2 物理锚定：三峡库区（真实调度曲线 + 水温气候态）
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: data
+- **Phase**: 阶段 2（真实数据 + 物理耦合）
+
+**Background**
+
+阶段 2 需一个具体水体接入真实物理强迫。D-003 遗留"真实旗舰水体"待定。物理耦合最自然演示于有明确调度与已知水位曲线的水库。
+
+**Options considered**
+
+1. 三峡库区（调度曲线公开、生态调度叙事最强、水温气候态可得）
+2. 鄱阳湖（水位-连通强，但无统一调度曲线）
+3. 多水体（数据与工作量大）
+
+**Decision**
+
+阶段 2 物理锚定 **三峡库区**：用公开的三峡水位调度曲线（175/145 m）+ 长江中游水温气候态作真实强迫；四大家鱼产卵机理（≥18℃ + 江水上涨）为真实机理；营养参数为文献一致合成。3-patch meta 结构保留，物理耦合聚焦库区 patch。
+
+**Rationale**
+
+1. 生态调度（[03](03-applications-yangtze.md) §4）是全项目最强叙事，三峡是其舞台。
+2. 水位调度曲线与水温气候态**公开可得**，构成真实强迫，符合"接真实数据"诉求。
+3. 春季消落 vs 产卵需上涨 的天然矛盾，使"调度×信号×增温解耦"成为可演示的涌现结果。
+
+**Consequences**
+
+- ✓ 真实强迫落地，机理故事完整且可辩护。
+- ✓ 与生态调度政策直接相关，利于论文线 3。
+- ✗ 营养配平仍非实测——需数据合作升级（开放问题）。
+- ✗ 单库聚焦，鄱阳湖等多水体对比留待后续。
+
+**References**
+
+- Code: `prototype/src/physics.js`, `prototype/data/foodweb-yangtze.json` (physics/provenance 块)
+- Docs: `09-phase2-coupling.md`
+- Related decisions: D-003, D-004
+
+---
+
+### D-004 阶段 2 物理↔营养双向耦合：降阶物理 + 真实强迫
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: methodology
+- **Phase**: 阶段 2（真实数据 + 物理耦合）
+
+**Background**
+
+[05](05-gaps-difficulties.md) §4 指出淡水物理↔营养双向耦合几乎空白。阶段 2 要在原型内演示此耦合，但沙箱内无法运行完整 GLM-AED/CE-QUAL-W2，也无实测逐日数据。
+
+**Options considered**
+
+1. 降阶物理（气候态强迫 + 1D 分层/消落代理）在浏览器内双向耦合
+2. 直接集成 GLM-AED/CE-QUAL-W2（重、需后端、超原型范围）
+3. 仅单向强迫（物理→营养，放弃反馈）
+
+**Decision**
+
+采用**降阶物理 + 双向耦合**：温度→光合（上行）、水位消落→消落带补给（空间流）、产卵信号×调度→家鱼补充、**营养→水质反馈**（浮游植物→透明度，鲢/鳙滤食抑藻=非经典生物操纵）。保留"接口契约"，物理内核未来可替换为 GLM-AED/CE-QUAL-W2。
+
+**Rationale**
+
+1. 双向（含营养→水质反馈）才真正填补 [05](05-gaps-difficulties.md) §4 的空白，单向不够。
+2. 降阶物理零后端、即开即用，且已用真实调度/水温强迫，机理可辩护。
+3. "接口契约"设计使阶段 2+ 换真实物理内核时营养侧不改。
+
+**Consequences**
+
+- ✓ 双向耦合可视、可交互、稳定（6 情景数值有界，已验证）。
+- ✓ "调度×产卵信号×增温"解耦成为**涌现结果**而非硬编码。
+- ✓ 生物操纵（鲢/鳙抑藻）在模型内闭环可见。
+- ✗ 降阶物理非求解器；速率调制系数经调参非率定。
+- ✗ 结论为机理演示，非定量预报。
+
+**References**
+
+- Code: `prototype/src/physics.js`, `prototype/src/engine.js`（coupling 块）, `prototype/src/ui.js`（物理面板）
+- Docs: `09-phase2-coupling.md`
+- Related decisions: D-002, D-005
 
 ---
 

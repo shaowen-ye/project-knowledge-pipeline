@@ -81,8 +81,13 @@
       <div><span>总生物量</span> <b id="m-tot">–</b></div>
     </div>
 
+    <h2>物理耦合 / Physics <span id="phys-anchor" style="font-weight:400;color:var(--mut);text-transform:none;letter-spacing:0"></span></h2>
+    <canvas id="physcanvas" width="278" height="188" style="width:100%;border:1px solid var(--border);border-radius:6px;background:#05171e"></canvas>
+    <div id="phys-readout" style="font-size:11px;color:var(--mut);margin-top:6px;line-height:1.6"></div>
+
     <h2>显示 / Display</h2>
     <label class="tog"><input type="checkbox" id="t-particles" checked> 能量粒子流</label>
+    <label class="tog"><input type="checkbox" id="t-phys" checked> 物理场 3D 提示（温度/补充脉冲）</label>
     <label class="tog"><input type="checkbox" id="t-inter" checked> 跨-patch 补给弧（meta-生态系统）</label>
     <label class="tog"><input type="checkbox" id="t-uncertainty"> 不确定性壳层（±CV）</label>
     <label class="tog"><input type="checkbox" id="t-labels" checked> 节点标签</label>
@@ -99,6 +104,7 @@
 <script src="vendor/three.min.js"></script>
 <script src="vendor/OrbitControls.js"></script>
 <script src="data/data.js"></script>
+<script src="src/physics.js"></script>
 <script src="src/engine.js"></script>
 <script src="src/render.js"></script>
 <script src="src/ui.js"></script>
