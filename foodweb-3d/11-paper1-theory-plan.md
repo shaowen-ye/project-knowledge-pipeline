@@ -123,7 +123,7 @@
 - [x] **T1**：补给项**动力学强耦合**（跨-patch 流进入 ODE）。✅ `prototype/theory/metaecosystem.js`（4 层链×3 patch，下行漂流 + 消费者扩散）。
 - [x] **T2**：控制机制指数。✅ per-capita 控制率分解（下行/蜂腰/上行，量纲一致可比）——见 [14](14-spatial-control-regime-model.md) §3。
 - [x] **T3**：**相图 Fig 2 + 梯度阈值 Fig 3 + 管理向量场 Fig 4 均已产出**（`prototype/theory-figures.html`）。Fig 4：禁渔(+α)/生态调度(+σ)/组合 在相图上的移动向量，示单一干预可跨越控制机制边界。
-- [x] **T4（部分）**：**边界解析条件已给**（等控制率轨迹 td=bu / ww=td / ww=bu，[14](14-spatial-control-regime-model.md) §4a），解析地解释 σ*(α) 右移。待补：P*(α,σ) 的闭式准静态近似。
+- [x] **T4**：**闭式准静态近似已给并验证**（[14](14-spatial-control-regime-model.md) §4a、`theory/closed-form.js`）：F\*/A\*/H\*/P\* 逐方程闭式，σ=0 时与数值**精确吻合**（测试覆盖）；解析结论 A\*/H\* 与 α 无关（Oksanen 型）+ σ\*(α) 线性上升。剩余：完整 σ 依赖的闭式修正（可选，数值已覆盖）。
 - [ ] **T5**（与线 3 共享数据）：EDM/CCM 沿连通度梯度 → Fig 5。
 - [ ] **T6**：写作按 §5；presubmission inquiry 给 Ecology Letters。
 

@@ -16,6 +16,7 @@ var E = require(path.join(root, 'src/engine.js'));
 var R = require(path.join(root, 'adapters/rpath-adapter.js'));
 var Mz = require(path.join(root, 'adapters/mizer-adapter.js'));
 var MetaEco = require(path.join(root, 'theory/metaecosystem.js'));
+var CF = require(path.join(root, 'theory/closed-form.js'));
 var data = JSON.parse(fs.readFileSync(path.join(root, 'data/foodweb-yangtze.json'), 'utf8'));
 
 var fails = 0, n = 0;
@@ -80,6 +81,12 @@ console.log('Theory module (line 1):');
 var prm = MetaEco.defaults(), seen = {};
 [0.5, 1.0, 1.6, 2.0].forEach(function (a) { [0.0, 0.5, 1.0, 1.4].forEach(function (s) { var r = MetaEco.regime(prm, a, s); if (r && !r.degenerate) seen[r.regime] = 1; }); });
 ok('phase diagram exhibits top-down / wasp-waist / bottom-up', seen['top-down'] && seen['wasp-waist'] && seen['bottom-up'], 'seen=' + Object.keys(seen).join(','));
+var cfOK = [0.6, 1.05, 1.6, 2.0].every(function (a) {
+  var cf = CF.closedForm(prm, a), x = MetaEco.equilibrium(prm, a, 0), i = MetaEco.idx, g = MetaEco.guilds;
+  return approx1(cf.A, x[i(prm.focal, g.A)]) && approx1(cf.H, x[i(prm.focal, g.H)]) && approx1(cf.F, x[i(prm.focal, g.F)]) && approx1(cf.P, x[i(prm.focal, g.P)]);
+});
+function approx1(a, b) { return Math.abs(a - b) / Math.max(Math.abs(b), 1e-9) < 1e-3; }
+ok('closed-form equilibrium matches numerical at sigma=0 (exact)', cfOK);
 
 console.log('\n' + (fails === 0 ? 'ALL ' + n + ' TESTS PASSED ✓' : fails + '/' + n + ' TEST(S) FAILED ✗'));
 process.exit(fails === 0 ? 0 : 1);
