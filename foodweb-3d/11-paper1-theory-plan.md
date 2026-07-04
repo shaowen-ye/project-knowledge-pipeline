@@ -120,12 +120,14 @@
 ---
 
 ## 9. 任务清单 / Task checklist
-- [ ] **T1**（2–3 周）：引擎补给项动力学强耦合（升级 [06](06-framework-design.md) 空间边为 ODE 耦合）。
-- [ ] **T2**：定义并实现三控制指数（press-perturbation）。
-- [ ] **T3**：相图扫描（互作×补给）→ Fig 2；梯度轨迹 + 阈值/滞后 → Fig 3；管理向量场 → Fig 4。
-- [ ] **T4**：简化链解析边界（附录数学）。
+- [x] **T1**：补给项**动力学强耦合**（跨-patch 流进入 ODE）。✅ `prototype/theory/metaecosystem.js`（4 层链×3 patch，下行漂流 + 消费者扩散）。
+- [x] **T2**：控制机制指数。✅ per-capita 控制率分解（下行/蜂腰/上行，量纲一致可比）——见 [14](14-spatial-control-regime-model.md) §3。
+- [x] **T3（部分）**：**相图 Fig 2 + 梯度阈值 Fig 3 已产出**（`prototype/theory-figures.html`，σ*(α) 随 α 右移的两杠杆交互）。待补：**Fig 4 管理向量场**。
+- [ ] **T4**：简化链解析边界（附录数学）——数值相图已有，解析近似待补。
 - [ ] **T5**（与线 3 共享数据）：EDM/CCM 沿连通度梯度 → Fig 5。
 - [ ] **T6**：写作按 §5；presubmission inquiry 给 Ecology Letters。
+
+> **理论核心已落地**：命题 T1（相图存在）、T2（补给迁移控制 + 临界阈值 σ*）已由 [14](14-spatial-control-regime-model.md) 的模型数值证实；剩余为解析化、管理向量场（Fig 4）、实证（Fig 5）与写作。
 
 ---
 

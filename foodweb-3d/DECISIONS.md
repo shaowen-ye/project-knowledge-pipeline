@@ -33,6 +33,7 @@
 | D-004 | 2026-07-04 | 阶段 2 物理↔营养双向耦合（降阶物理 + 真实强迫） | methodology | ✅ Accepted |
 | D-005 | 2026-07-04 | 阶段 2 物理锚定=三峡库区（真实调度曲线+水温气候态） | data | ✅ Accepted |
 | D-006 | 2026-07-04 | 论文线 2 硬门槛：L2 规范 + Rpath/mizer 双适配器（原生格式，往返验证） | tooling | ✅ Accepted |
+| D-007 | 2026-07-04 | 论文线 1 理论核心：meta-生态系统模块 + per-capita 控制机制分类 → 相图 | methodology | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -297,6 +298,50 @@ L3 = **three.js r128 UMD**（暴露 `window.THREE`，全内联，CSP 友好）+ 
 - Code: `prototype/adapters/{rpath,mizer}-adapter.js`, `roundtrip-test.js`, `data/l2-schema.json`
 - Docs: `13-L2-interchange-spec.md`, `12-paper2-software-plan.md` §7/§9
 - Related decisions: D-002
+
+---
+
+### D-007 论文线 1 理论核心：meta-生态系统模块 + per-capita 控制机制分类 → 相图
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: methodology
+- **Phase**: 论文线 1 理论开发
+
+**Background**
+
+论文线 1 需把跨系统补给做成**动力学强耦合**并产出**控制机制相图**（[11](11-paper1-theory-plan.md) T1–T3）。应用型 18 组引擎不适合理论相图；且控制机制的可比、可迁移分类是难点。
+
+**Options considered**
+
+1. 复用 18 组应用引擎加空间耦合（重、难解释、相图不清）
+2. 独立极简正则模块（4 层链×3 patch）+ 干净分类器（理论标准做法）
+3. 纯解析（欠通用，难含空间流）
+
+分类器子选择：(a) Jacobian 弹性；(b) 传播范数；(c) **per-capita 控制率**。
+
+**Decision**
+
+采用**方案 2**：独立 `prototype/theory/metaecosystem.js`（4 层 A→H→F→P × 3 patch，下行漂流 + 消费者扩散，饵料层自限 selfF 作蜂腰闸门；α 缩放上层捕食、σ 缩放跨-patch 流）。分类用 **per-capita 控制率**（下行=α·a_FP·P，蜂腰=2·selfF·F，上行=mF+σ·disp）。产出 40×40 相图（三区俱全）+ 梯度阈值 σ*(α)。
+
+**Rationale**
+
+1. 极简正则模块是理论相图的标准、可解释做法（Loreau/Gravel/Massol 风格）。
+2. **早期弹性/传播范数分类器被"下行恒赢"支配**（诊断:均匀缩放 α 不改无量纲弹性;下行级联在链中天然最大）——per-capita 控制率同量纲、各由一个可动机制驱动,才得到三区相图。
+3. α=上层捕食（非均匀缩放）才改变相对控制结构;selfF 提供蜂腰机制;这两点是关键修正。
+
+**Consequences**
+
+- ✓ 命题 T1/T2 数值证实:相图存在、σ* 阈值存在且随 α 右移(两杠杆交互)。
+- ✓ Fig 2/3 已产出(`theory-figures.html`,自包含,已渲染验证)。
+- ✗ 演示级、参数经调参;蜂腰区较窄;单稳态无滞后;解析边界与实证(Fig 4/5)待补。
+- ✗ 分类对定义敏感——正式稿需多定义稳健性。
+
+**References**
+
+- Code: `prototype/theory/metaecosystem.js`, `phase-diagram.js`, `theory-figures.html`
+- Docs: `14-spatial-control-regime-model.md`, `11-paper1-theory-plan.md`
+- Related decisions: D-001（长江锚定）, D-004（耦合思路）
 
 ---
 
