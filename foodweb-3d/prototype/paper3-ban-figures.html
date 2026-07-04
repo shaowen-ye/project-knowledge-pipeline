@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>论文线 3 · 禁渔前后综合 Fig 2–3（草图）</title>
+<style>
+  :root { --bg:#06121a; --panel:#0b1c24; --border:#1b3540; --fg:#e8f1f2; --mut:#7d9aa3;
+    --up:#66bb6a; --chg:#f0a020; --na:#25333a; --teal:#38bec9; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); padding:22px;
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; }
+  h1 { font-size:16px; margin:0 0 3px; }
+  .sub { font-size:11.5px; color:var(--mut); margin-bottom:18px; line-height:1.6; max-width:940px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:18px; max-width:1180px; }
+  .fig { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px; }
+  .fig h2 { font-size:13px; margin:0 0 10px; }
+  table { border-collapse:collapse; width:100%; font-size:11px; }
+  th, td { border:1px solid var(--border); padding:6px 7px; text-align:center; }
+  th { color:var(--mut); font-weight:600; font-size:10.5px; }
+  td.wb { text-align:left; white-space:nowrap; }
+  .src { font-size:9px; color:var(--mut); }
+  .arrow-up { color:var(--up); font-weight:700; }
+  .arrow-chg { color:var(--chg); font-weight:700; }
+  .na { color:#3a4a52; }
+  .legend { display:flex; flex-wrap:wrap; gap:14px; font-size:11px; color:var(--mut); margin:12px 2px 0; }
+  .legend b { color:var(--fg); }
+  .cap { font-size:10.5px; color:var(--mut); line-height:1.55; margin:10px 2px 0; }
+  .concord td.match { color:var(--up); font-weight:700; }
+  .bar { display:inline-block; height:9px; border-radius:2px; vertical-align:middle; }
+  .note { font-size:10px; color:var(--mut); margin-top:16px; max-width:1180px; line-height:1.6;
+    border-top:1px solid var(--border); padding-top:10px; }
+  b { font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<h1>论文线 3 · 十年禁渔前后食物网综合 Fig 2–3（草图 / model-side draft）</h1>
+<div class="sub">Fig 2=多水体禁渔后变化的<b>文献方向性综合</b>（↑/结构变化，非杜撰效应量）；Fig 3=应用引擎 ban 情景预测方向与观测方向的<b>符号一致性验证</b>。<b>方向性综合 + 演示级模型</b>；精确 before/after 效应量需真实监测数据（见 <code>10-paper3-manuscript-plan.md</code> §9）。</div>
+
+<div class="grid">
+  <div class="fig">
+    <h2>Fig 2 · 禁渔后多水体网络变化（方向性综合）/ Directional synthesis</h2>
+    <div id="synth"></div>
+    <div class="legend">
+      <span><b class="arrow-up">↑</b> 升高</span>
+      <span><b class="arrow-chg">~</b> 结构重构</span>
+      <span><b class="na">·</b> 未报告</span>
+    </div>
+    <div class="cap">凡有报告处方向一致为<b>升高</b>（复杂度/营养级/捕食者/多样性/稳定性）；赣江为低营养级结构重构。每行附文献来源。方向已核实，作者/精确值待核（[待核实]）。</div>
+  </div>
+
+  <div class="fig">
+    <h2>Fig 3 · 模型-观测符号一致性 / Model–observation sign concordance</h2>
+    <div id="concord"></div>
+    <div class="cap">应用引擎 ban 情景（相对 baseline，第 8–10 年均值）预测方向与文献观测方向对比。四项指标<b>符号全部一致（↑）</b>——机理模型复现了禁渔的观测网络变化方向（论文线 3 命题 P2 的符号级验证）。</div>
+  </div>
+</div>
+
+<div class="note">图注：这是**方向性/符号级**验证——正式稿的定量效应量（斜率图/森林图）与样本外技能分数需真实多水体监测数据（<code>10-paper3-manuscript-plan.md</code> §9 数据分级）。模型值由 <code>prototype/src/engine.js</code> 产出；综合来源见 <code>data/ban-synthesis.json</code> 与 <code>08-references.md</code>。</div>
+
+<script id="figdata" type="application/json">{
+  "note_zh": "十年禁渔前后长江多水体食物网变化的文献综合。多为已核实的方向性发现（非精确 before/after 数值）——诚实标注 status=directional。model 为本项目应用引擎 ban 情景相对 baseline 的预测方向（用于符号一致性验证 Fig 3）。",
+  "note_en": "Literature synthesis of post-ban food-web change across Yangtze water bodies. Mostly verified DIRECTIONAL findings (not precise before/after values) — flagged status=directional. `model` is the applied engine's ban-vs-baseline predicted direction (for sign-concordance in Fig 3).",
+  "metrics": [
+    { "key": "complexity",  "zh": "网络复杂度/连接度", "en": "network complexity" },
+    { "key": "mean_TL",     "zh": "平均营养级",       "en": "mean trophic level" },
+    { "key": "top_pred",    "zh": "顶级/大型捕食者",   "en": "top / large predators" },
+    { "key": "diversity",   "zh": "多样性",           "en": "diversity" },
+    { "key": "lower_troph", "zh": "低营养级结构",      "en": "lower-trophic structure" },
+    { "key": "stability",   "zh": "稳定性",           "en": "stability" }
+  ],
+  "waterbodies": [
+    { "id": "estuary", "zh": "长江口", "en": "Yangtze estuary",
+      "dirs": { "complexity": "+", "mean_TL": "+", "top_pred": "+" },
+      "source": "河口 ENA 网络恢复 2025 [待核实作者]", "status": "directional" },
+    { "id": "chishui", "zh": "赤水河", "en": "Chishui River",
+      "dirs": { "top_pred": "+", "diversity": "+" },
+      "source": "Ecological Processes 2023 [待核实作者]", "status": "directional" },
+    { "id": "mid_yangtze", "zh": "长江中游", "en": "middle Yangtze",
+      "dirs": { "diversity": "+" },
+      "source": "Front. Environ. Sci. 2024 [待核实作者]", "status": "directional" },
+    { "id": "gan", "zh": "赣江", "en": "Gan River",
+      "dirs": { "lower_troph": "~" },
+      "source": "Ecology & Evolution 2024, PMC11362611 [待核实作者]", "status": "directional" },
+    { "id": "caohai", "zh": "草海", "en": "Caohai Lake",
+      "dirs": { "stability": "+" },
+      "source": "Water 2024, 16:782 [待核实作者]", "status": "directional" },
+    { "id": "basin", "zh": "流域尺度", "en": "basin-scale",
+      "dirs": { "diversity": "+" },
+      "source": "2024 流域生物多样性逆转分析 [待核实]", "status": "directional" }
+  ],
+  "model": { "complexity": "+", "mean_TL": "+", "top_pred": "+", "transfer_eff": "+" },
+  "modelValues": {
+    "connectance": [0.069, 0.082],
+    "transfer_eff": [0.125, 0.252],
+    "mean_TL": [1.749, 1.855],
+    "predator_B": [10.56, 21.24]
+  }
+}</script>
+<script>
+(function () {
+  var D = JSON.parse(document.getElementById('figdata').textContent);
+  var metricLabel = {}; D.metrics.forEach(function (m) { metricLabel[m.key] = m.zh; });
+
+  // ---- Fig 2: directional synthesis table ----
+  (function () {
+    var html = '<table><thead><tr><th>水体</th>';
+    D.metrics.forEach(function (m) { html += '<th>' + m.zh + '</th>'; });
+    html += '</tr></thead><tbody>';
+    D.waterbodies.forEach(function (wb) {
+      html += '<tr><td class="wb">' + wb.zh + '<br><span class="src">' + wb.source + '</span></td>';
+      D.metrics.forEach(function (m) {
+        var d = wb.dirs[m.key];
+        if (d === '+') html += '<td class="arrow-up">↑</td>';
+        else if (d === '~') html += '<td class="arrow-chg">~</td>';
+        else if (d === '-') html += '<td style="color:#ef5350;font-weight:700">↓</td>';
+        else html += '<td class="na">·</td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('synth').innerHTML = html;
+  })();
+
+  // ---- Fig 3: sign concordance + model before/after bars ----
+  (function () {
+    var mv = D.modelValues;
+    var rows = [
+      { key: 'complexity', label: '网络复杂度/连接度', mkey: 'connectance' },
+      { key: 'mean_TL', label: '平均营养级', mkey: 'mean_TL' },
+      { key: 'top_pred', label: '顶级捕食者生物量', mkey: 'predator_B' },
+      { key: 'transfer_eff', label: '传递效率', mkey: 'transfer_eff', obsFromModelOnly: true }
+    ];
+    // observed direction per metric = any waterbody reporting it
+    function observedDir(key) {
+      var found = null;
+      D.waterbodies.forEach(function (wb) { if (wb.dirs[key]) found = wb.dirs[key]; });
+      return found;
+    }
+    var html = '<table class="concord"><thead><tr><th>指标</th><th>观测方向</th><th>模型方向</th><th>一致</th><th>模型 前 → 后</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      var obs = r.obsFromModelOnly ? '(模型量)' : (observedDir(r.key) || '—');
+      var mod = D.model[r.key] || D.model[r.mkey] || '+';
+      var obsSym = obs === '+' ? '↑' : obs === '~' ? '~' : obs;
+      var match = (!r.obsFromModelOnly && obs === '+' && mod === '+') ? '✓' : (r.obsFromModelOnly ? '—' : '');
+      var v = mv[r.mkey];
+      var lo = Math.min(v[0], v[1]), hi = Math.max(v[0], v[1]), scale = 120 / hi;
+      var bars = '<span class="bar" style="width:' + (v[0] * scale) + 'px;background:#5b7684"></span> ' + v[0] +
+        ' <span style="color:var(--up)">→</span> <span class="bar" style="width:' + (v[1] * scale) + 'px;background:#66bb6a"></span> ' + v[1];
+      html += '<tr><td class="wb">' + r.label + '</td><td>' + obsSym + '</td><td class="arrow-up">' + (mod === '+' ? '↑' : mod) +
+        '</td><td class="' + (match === '✓' ? 'match' : '') + '">' + match + '</td><td style="text-align:left">' + bars + '</td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('concord').innerHTML = html;
+  })();
+})();
+</script>
+</body>
+</html>

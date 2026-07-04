@@ -41,7 +41,8 @@
 | [11-paper1-theory-plan.md](11-paper1-theory-plan.md) | 论文线 1 稿件计划 | 理论统一（空间控制机制相图）→ Ecol Lett/NEE |
 | [12-paper2-software-plan.md](12-paper2-software-plan.md) | 论文线 2 稿件计划 | 方法+软件（开源 3D 交互框架）→ MEE/Ecol Modelling |
 | [13-L2-interchange-spec.md](13-L2-interchange-spec.md) | L2 交换格式规范 | 模型无关 schema + JSON Schema + Rpath/mizer 适配器往返证明 |
-| [14-spatial-control-regime-model.md](14-spatial-control-regime-model.md) | 空间控制机制模型与相图 | 论文线 1 理论核心：meta-生态系统模块 + 控制机制相图 Fig 2/3 |
+| [14-spatial-control-regime-model.md](14-spatial-control-regime-model.md) | 空间控制机制模型与相图 | 论文线 1 理论核心：meta-生态系统模块 + 控制机制相图 Fig 2–4 |
+| [15-paper3-ban-synthesis.md](15-paper3-ban-synthesis.md) | 论文线 3 禁渔综合与验证 | 多水体方向性综合 Fig 2 + 模型符号一致性 Fig 3 |
 | [prototype/](prototype/) | 阶段 1–2 可运行原型 + 图 | three.js 3D 交互 + 物理耦合 + 论文线 3 模型侧图（`prototype/README.md`） |
 | [DECISIONS.md](DECISIONS.md) | 决策日志 | 范围与方法决策的不可变记录（D-001…D-005） |
 

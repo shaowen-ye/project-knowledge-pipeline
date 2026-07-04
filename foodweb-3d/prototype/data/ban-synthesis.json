@@ -1,0 +1,39 @@
+{
+  "note_zh": "十年禁渔前后长江多水体食物网变化的文献综合。多为已核实的方向性发现（非精确 before/after 数值）——诚实标注 status=directional。model 为本项目应用引擎 ban 情景相对 baseline 的预测方向（用于符号一致性验证 Fig 3）。",
+  "note_en": "Literature synthesis of post-ban food-web change across Yangtze water bodies. Mostly verified DIRECTIONAL findings (not precise before/after values) — flagged status=directional. `model` is the applied engine's ban-vs-baseline predicted direction (for sign-concordance in Fig 3).",
+  "metrics": [
+    { "key": "complexity",  "zh": "网络复杂度/连接度", "en": "network complexity" },
+    { "key": "mean_TL",     "zh": "平均营养级",       "en": "mean trophic level" },
+    { "key": "top_pred",    "zh": "顶级/大型捕食者",   "en": "top / large predators" },
+    { "key": "diversity",   "zh": "多样性",           "en": "diversity" },
+    { "key": "lower_troph", "zh": "低营养级结构",      "en": "lower-trophic structure" },
+    { "key": "stability",   "zh": "稳定性",           "en": "stability" }
+  ],
+  "waterbodies": [
+    { "id": "estuary", "zh": "长江口", "en": "Yangtze estuary",
+      "dirs": { "complexity": "+", "mean_TL": "+", "top_pred": "+" },
+      "source": "河口 ENA 网络恢复 2025 [待核实作者]", "status": "directional" },
+    { "id": "chishui", "zh": "赤水河", "en": "Chishui River",
+      "dirs": { "top_pred": "+", "diversity": "+" },
+      "source": "Ecological Processes 2023 [待核实作者]", "status": "directional" },
+    { "id": "mid_yangtze", "zh": "长江中游", "en": "middle Yangtze",
+      "dirs": { "diversity": "+" },
+      "source": "Front. Environ. Sci. 2024 [待核实作者]", "status": "directional" },
+    { "id": "gan", "zh": "赣江", "en": "Gan River",
+      "dirs": { "lower_troph": "~" },
+      "source": "Ecology & Evolution 2024, PMC11362611 [待核实作者]", "status": "directional" },
+    { "id": "caohai", "zh": "草海", "en": "Caohai Lake",
+      "dirs": { "stability": "+" },
+      "source": "Water 2024, 16:782 [待核实作者]", "status": "directional" },
+    { "id": "basin", "zh": "流域尺度", "en": "basin-scale",
+      "dirs": { "diversity": "+" },
+      "source": "2024 流域生物多样性逆转分析 [待核实]", "status": "directional" }
+  ],
+  "model": { "complexity": "+", "mean_TL": "+", "top_pred": "+", "transfer_eff": "+" },
+  "modelValues": {
+    "connectance": [0.069, 0.082],
+    "transfer_eff": [0.125, 0.252],
+    "mean_TL": [1.749, 1.855],
+    "predator_B": [10.56, 21.24]
+  }
+}
