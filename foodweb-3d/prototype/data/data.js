@@ -103,6 +103,9 @@ window.FOODWEB_DATA = {
     { "id": "warming", "name_zh": "气候增温", "name_en": "Climate warming",
       "desc_zh": "水温 +3℃，产卵信号提前，与固定 5 月调度错配→补充收益被抵消（涌现式解耦）；夏季分层增强。", "desc_en": "+3°C: the ≥18°C spawning cue advances and decouples from the fixed May dispatch → recruitment benefit is cancelled (emergent decoupling); stronger summer stratification.",
       "dispatch": true, "tempDelta": 3, "stratBoost": 0.4 },
+    { "id": "adaptive", "name_zh": "自适应调度·增温", "name_en": "Adaptive dispatch (warming)",
+      "desc_zh": "+3℃ 下让人工洪峰追踪水温产卵信号（不固定 5 月）→ 补充被救回，示范管理杠杆。", "desc_en": "Under +3°C, the flood pulse tracks the temperature spawning cue (not fixed to May) → recruitment rescued; the management lever.",
+      "dispatch": true, "adaptiveDispatch": true, "tempDelta": 3, "stratBoost": 0.4 },
     { "id": "invasion", "name_zh": "外来种入侵", "name_en": "Invasive species",
       "desc_zh": "引种银鱼与浮游动物/鲢竞争，能量传递效率下降，网络脆弱化。", "desc_en": "Introduced icefish competes with zooplankton/silver carp; transfer efficiency drops, web simplifies.",
       "press": { "zooplankton": -0.14, "silvercarp": -0.10 } }

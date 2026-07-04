@@ -36,14 +36,16 @@
     const tempDelta = (scen && scen.tempDelta) || 0;
     const stratBoost = (scen && scen.stratBoost) || 0;
     const dispatchOn = !!(scen && scen.dispatch);
+    const adaptive = !!(scen && scen.adaptiveDispatch);
     const thr = P.spawnTempThreshold_c;
     const dispatchPeak = P.dispatchPeakMonth;   // 1-based (5 = May)
     const stratMonths = P.coupling.stratSummerMonths;
 
     // biological spawning readiness is a PULSE centered on the 18°C crossing;
     // warming advances this crossing → it drifts away from the fixed May dispatch.
+    // Adaptive dispatch tracks the crossing (releases the flood when fish are ready).
     const bioPeak = tempCrossMonth(P, tempDelta);          // 0-based fractional month
-    const dispatchPeak0 = dispatchPeak - 1;                // 0-based
+    const dispatchPeak0 = adaptive ? bioPeak : (dispatchPeak - 1);
 
     const out = [];
     for (let t = 0; t <= months; t++) {

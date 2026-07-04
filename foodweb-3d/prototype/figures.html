@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>论文线 3 · 模型侧图 Fig 4–6（草图）</title>
+<style>
+  :root { --bg:#06121a; --panel:#0b1c24; --border:#1b3540; --fg:#e8f1f2; --mut:#7d9aa3;
+    --teal:#38bec9; --orange:#ff9f40; --green:#66bb6a; --pink:#e15b97; --red:#ef5350; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; padding:22px; }
+  h1 { font-size:16px; margin:0 0 3px; }
+  .sub { font-size:11.5px; color:var(--mut); margin-bottom:20px; line-height:1.6; max-width:820px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:18px; max-width:1180px; }
+  .fig { background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 14px 12px; }
+  .fig h2 { font-size:13px; margin:0 0 2px; }
+  .fig .cap { font-size:10.5px; color:var(--mut); line-height:1.55; margin:8px 2px 0; }
+  canvas { width:100%; height:auto; display:block; }
+  .legend { display:flex; flex-wrap:wrap; gap:12px; font-size:10.5px; color:var(--mut); margin:8px 2px 0; }
+  .legend i { display:inline-block; width:14px; height:3px; border-radius:2px; margin-right:5px; vertical-align:middle; }
+  .note { font-size:10px; color:var(--mut); margin-top:18px; max-width:1180px; line-height:1.6;
+    border-top:1px solid var(--border); padding-top:10px; }
+  b { font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+<h1>论文线 3 · 模型侧图 Fig 4–6（草图 / model-side draft figures）</h1>
+<div class="sub">由 <code>prototype/</code> 引擎 + 物理耦合（[09]）直接产出，示范 <a style="color:var(--teal)">10-paper3-manuscript-plan.md</a> §7 的机制核心图。<b>演示级模型 + 合成/示意营养参数 + 真实三峡强迫</b>；数值为方向-相对示意，非定量预报。</div>
+
+<div class="grid">
+  <div class="fig">
+    <h2>Fig 4 · 产卵-流量闸门 / Spawning–flow gate</h2>
+    <canvas id="f4" width="640" height="420"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--teal)"></i>水位 (m)</span>
+      <span><i style="background:var(--orange)"></i>水温 (℃)</span>
+      <span><i style="background:var(--pink)"></i>家鱼补充（调度）</span>
+      <span><i style="background:var(--pink);opacity:.5"></i>补充（基线≈0）</span>
+    </div>
+    <div class="cap">三峡库区年内：春季<b>消落</b>（水位降至 ~146 m）截断家鱼产卵所需涨水，基线补充≈0；生态调度 5 月人工洪峰在水温跨 18℃ 时恢复<b>补充脉冲</b>。</div>
+  </div>
+
+  <div class="fig">
+    <h2>Fig 5 · 增温解耦与自适应救回 / Warming decoupling &amp; adaptive rescue</h2>
+    <canvas id="f5" width="640" height="420"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--orange)"></i>固定 5 月调度</span>
+      <span><i style="background:var(--green)"></i>自适应（追温）调度</span>
+    </div>
+    <div class="cap">随增温 Δ℃，产卵信号提前、与<b>固定</b>调度错配，补充单调下降（−36% @ +3℃）；<b>自适应</b>调度追踪 18℃ 跨越，补充维持高位——管理杠杆。</div>
+  </div>
+
+  <div class="fig">
+    <h2>Fig 6 · 管理杠杆因子情景 / Management factorial</h2>
+    <canvas id="f6" width="640" height="420"></canvas>
+    <div class="legend">
+      <span><i style="background:var(--pink)"></i>家鱼补充（峰值）</span>
+      <span><i style="background:var(--teal)"></i>传递效率（网络恢复）</span>
+    </div>
+    <div class="cap"><b>禁渔</b>恢复网络（传递效率 0.13→0.25）却不恢复补充；<b>调度/自适应</b>恢复补充却不改网络拓扑——<b>无单一杠杆两者兼得</b>，须协同。</div>
+  </div>
+</div>
+
+<div class="note">图注：Fig 2/3（禁渔前后多水体网络综合、模型样本外验证）需真实数据综合（见 §9），此处未含。Fig 4/5/6 为模型侧、现有原型即可产出。<br>
+坐标与数值：Fig 4 左轴水位 145–176 m、右轴补充 0–0.7 与水温 8–30℃；Fig 5 x=增温 0–5℃、y=补充峰值 0–1；Fig 6 双序列归一到各自量纲。</div>
+
+<script id="figdata" type="application/json">{
+ "fig4": {
+  "dispatch": [
+   {
+    "wl": 173,
+    "temp": 11,
+    "recr": 4.905232247754371e-7,
+    "disp": 0.00005136553118975947
+   },
+   {
+    "wl": 168,
+    "temp": 11.5,
+    "recr": 0.0004728153834208588,
+    "disp": 0.0038659201394728076
+   },
+   {
+    "wl": 162,
+    "temp": 14,
+    "recr": 0.04878239436287837,
+    "disp": 0.08465798862252998
+   },
+   {
+    "wl": 156,
+    "temp": 18,
+    "recr": 0.5387336690901612,
+    "disp": 0.5394075072376266
+   },
+   {
+    "wl": 150,
+    "temp": 22,
+    "recr": 0.6368316143717414,
+    "disp": 1
+   },
+   {
+    "wl": 146,
+    "temp": 25,
+    "recr": 0.08057765101455895,
+    "disp": 0.5394075072376266
+   },
+   {
+    "wl": 146,
+    "temp": 27.5,
+    "recr": 0.0010912998148894383,
+    "disp": 0.08465798862252998
+   },
+   {
+    "wl": 148,
+    "temp": 28,
+    "recr": 0.00006460021635776819,
+    "disp": 0.0038659201394728076
+   },
+   {
+    "wl": 156,
+    "temp": 25,
+    "recr": 9.151822950208389e-7,
+    "disp": 0.00005136553118975947
+   },
+   {
+    "wl": 168,
+    "temp": 21,
+    "recr": 1.5517311968385363e-9,
+    "disp": 1.9857504150120976e-7
+   },
+   {
+    "wl": 175,
+    "temp": 16.5,
+    "recr": 7.872281702275937e-13,
+    "disp": 2.233631436203166e-10
+   },
+   {
+    "wl": 174,
+    "temp": 13,
+    "recr": 1.3793797348003173e-27,
+    "disp": 7.310251818545068e-14
+   }
+  ],
+  "baseline": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0.00006460021635776819,
+   9.151822950208389e-7,
+   1.5517311968385363e-9,
+   7.872281702275937e-13,
+   0
+  ]
+ },
+ "fig5": {
+  "delta": [
+   0,
+   0.5,
+   1,
+   1.5,
+   2,
+   2.5,
+   3,
+   3.5,
+   4,
+   4.5,
+   5
+  ],
+  "fixed": [
+   0.637,
+   0.546,
+   0.529,
+   0.507,
+   0.476,
+   0.451,
+   0.407,
+   0.376,
+   0.327,
+   0.263,
+   0.202
+  ],
+  "adaptive": [
+   0.997,
+   0.989,
+   0.956,
+   0.872,
+   0.756,
+   0.836,
+   0.933,
+   0.975,
+   1,
+   0.956,
+   0.836
+  ]
+ },
+ "fig6": [
+  {
+   "id": "baseline",
+   "recr": 0,
+   "transferEff": 0.125,
+   "topDown": 0.058,
+   "connectance": 0.069
+  },
+  {
+   "id": "ban",
+   "recr": 0,
+   "transferEff": 0.252,
+   "topDown": 0.11,
+   "connectance": 0.082
+  },
+  {
+   "id": "dispatch",
+   "recr": 0.637,
+   "transferEff": 0.127,
+   "topDown": 0.059,
+   "connectance": 0.069
+  },
+  {
+   "id": "warming",
+   "recr": 0.407,
+   "transferEff": 0.126,
+   "topDown": 0.059,
+   "connectance": 0.07
+  },
+  {
+   "id": "adaptive",
+   "recr": 0.933,
+   "transferEff": 0.127,
+   "topDown": 0.059,
+   "connectance": 0.07
+  }
+ ],
+ "names": {
+  "baseline": "基线",
+  "ban": "十年禁渔",
+  "dispatch": "生态调度",
+  "warming": "气候增温",
+  "adaptive": "自适应调度"
+ }
+}</script>
+<script>
+(function(){
+  var D = JSON.parse(document.getElementById('figdata').textContent);
+  var C = { teal:'#38bec9', orange:'#ff9f40', green:'#66bb6a', pink:'#e15b97', mut:'#7d9aa3', grid:'#16323c', fg:'#e8f1f2' };
+  var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+
+  function axes(ctx, x0,y0,x1,y1){ ctx.strokeStyle=C.mut; ctx.lineWidth=1; ctx.beginPath();
+    ctx.moveTo(x0,y0); ctx.lineTo(x0,y1); ctx.lineTo(x1,y1); ctx.stroke(); }
+  function gridlines(ctx,x0,x1,ys){ ctx.strokeStyle=C.grid; ctx.lineWidth=1; ys.forEach(function(y){
+    ctx.beginPath(); ctx.moveTo(x0,y); ctx.lineTo(x1,y); ctx.stroke(); }); }
+  function txt(ctx,s,x,y,col,size,align){ ctx.fillStyle=col||C.mut; ctx.font=(size||10)+'px sans-serif';
+    ctx.textAlign=align||'left'; ctx.textBaseline='middle'; ctx.fillText(s,x,y); ctx.textAlign='left'; }
+
+  // ---- Fig 4 ----
+  (function(){
+    var cv=document.getElementById('f4'), ctx=cv.getContext('2d'), W=cv.width,H=cv.height;
+    var L=46,R=W-46,T=24,B=H-40;
+    var wlLo=145,wlHi=176, recLo=0,recHi=0.7, tLo=8,tHi=30;
+    var xat=function(i){return L+i/11*(R-L);};
+    var yWL=function(v){return B-(v-wlLo)/(wlHi-wlLo)*(B-T);};
+    var yR=function(v){return B-(v-recLo)/(recHi-recLo)*(B-T);};
+    var yT=function(v){return B-(v-tLo)/(tHi-tLo)*(B-T);};
+    gridlines(ctx,L,R,[T,(T+B)/2,B]); axes(ctx,L,T,R,B);
+    for(var m=0;m<12;m++) txt(ctx,months[m],xat(m),B+12,C.mut,9,'center');
+    txt(ctx,'月 / month',(L+R)/2,B+26,C.mut,10,'center');
+    // 18°C threshold marker on temp
+    ctx.strokeStyle='rgba(255,159,64,0.3)'; ctx.setLineDash([4,3]); ctx.beginPath();
+    ctx.moveTo(L,yT(18)); ctx.lineTo(R,yT(18)); ctx.stroke(); ctx.setLineDash([]);
+    txt(ctx,'18℃产卵阈',R-4,yT(18)-7,'rgba(255,159,64,.8)',9,'right');
+    function line(arr,acc,col,w,dash){ ctx.strokeStyle=col; ctx.lineWidth=w||2; if(dash)ctx.setLineDash(dash);
+      ctx.beginPath(); arr.forEach(function(p,i){ var y=acc(p); i?ctx.lineTo(xat(i),y):ctx.moveTo(xat(i),y); }); ctx.stroke(); ctx.setLineDash([]); }
+    line(D.fig4.dispatch,function(p){return yWL(p.wl);},C.teal,2);
+    line(D.fig4.dispatch,function(p){return yT(p.temp);},C.orange,1.5);
+    // recruitment area (dispatch)
+    ctx.fillStyle='rgba(225,91,151,0.25)'; ctx.beginPath(); ctx.moveTo(xat(0),yR(0));
+    D.fig4.dispatch.forEach(function(p,i){ctx.lineTo(xat(i),yR(p.recr));}); ctx.lineTo(xat(11),yR(0)); ctx.fill();
+    line(D.fig4.dispatch,function(p){return yR(p.recr);},C.pink,2);
+    line(D.fig4.baseline.map(function(r){return {r:r};}),function(p){return yR(p.r);},C.pink,1.5,[3,3]);
+    txt(ctx,'水位 175/145 m',L+3,T+8,C.teal,9); txt(ctx,'补充脉冲',xat(4)+2,yR(0.62),C.pink,10);
+    txt(ctx,'春季消落',xat(4),yWL(150)+2,C.teal,9,'center');
+  })();
+
+  // ---- Fig 5 ----
+  (function(){
+    var cv=document.getElementById('f5'), ctx=cv.getContext('2d'), W=cv.width,H=cv.height;
+    var L=48,R=W-20,T=24,B=H-40; var d=D.fig5;
+    var xat=function(i){return L+d.delta[i]/5*(R-L);};
+    var yat=function(v){return B-v/1.0*(B-T);};
+    gridlines(ctx,L,R,[T,(T+B)/2,B]); axes(ctx,L,T,R,B);
+    [0,1,2,3,4,5].forEach(function(dd){ txt(ctx,'+'+dd,L+dd/5*(R-L),B+12,C.mut,9,'center'); });
+    txt(ctx,'增温 Δ℃ / warming',(L+R)/2,B+26,C.mut,10,'center');
+    [0,0.5,1].forEach(function(v){ txt(ctx,v.toFixed(1),L-6,yat(v),C.mut,9,'right'); });
+    txt(ctx,'家鱼补充峰值',L-6,T-10,C.mut,9,'left');
+    function line(arr,col){ ctx.strokeStyle=col; ctx.lineWidth=2.4; ctx.beginPath();
+      arr.forEach(function(v,i){ i?ctx.lineTo(xat(i),yat(v)):ctx.moveTo(xat(i),yat(v)); }); ctx.stroke();
+      arr.forEach(function(v,i){ ctx.fillStyle=col; ctx.beginPath(); ctx.arc(xat(i),yat(v),2.4,0,7); ctx.fill(); }); }
+    line(d.adaptive,C.green); line(d.fixed,C.orange);
+    // annotate -36% at +3
+    var i3=d.delta.indexOf(3);
+    if(i3>=0){ ctx.strokeStyle='rgba(232,241,242,.4)'; ctx.setLineDash([3,3]); ctx.beginPath();
+      ctx.moveTo(xat(i3),yat(d.fixed[i3])); ctx.lineTo(xat(i3),yat(d.adaptive[i3])); ctx.stroke(); ctx.setLineDash([]);
+      txt(ctx,'−36%',xat(i3)+5,(yat(d.fixed[i3])+yat(d.adaptive[i3]))/2,C.fg,10); }
+    txt(ctx,'自适应（追温）',xat(8),yat(d.adaptive[8])-10,C.green,10,'center');
+    txt(ctx,'固定 5 月',xat(8),yat(d.fixed[8])+12,C.orange,10,'center');
+  })();
+
+  // ---- Fig 6 ----
+  (function(){
+    var cv=document.getElementById('f6'), ctx=cv.getContext('2d'), W=cv.width,H=cv.height;
+    var L=46,R=W-20,T=24,B=H-52; var f=D.fig6;
+    gridlines(ctx,L,R,[T,(T+B)/2,B]); axes(ctx,L,T,R,B);
+    var n=f.length, gw=(R-L)/n, bw=gw*0.30;
+    var recMax=1.0, teMax=0.30;
+    f.forEach(function(s,i){
+      var cx=L+gw*(i+0.5);
+      var hr=(s.recr/recMax)*(B-T), ht=(s.transferEff/teMax)*(B-T);
+      ctx.fillStyle=C.pink; ctx.fillRect(cx-bw-2,B-hr,bw,hr);
+      ctx.fillStyle=C.teal; ctx.fillRect(cx+2,B-ht,bw,ht);
+      txt(ctx,D.names[s.id],cx,B+13,C.mut,9.5,'center');
+      if(s.recr>0) txt(ctx,s.recr.toFixed(2),cx-bw/2-2,B-hr-7,C.pink,8.5,'center');
+      txt(ctx,s.transferEff.toFixed(2),cx+bw/2+2,B-ht-7,C.teal,8.5,'center');
+    });
+    txt(ctx,'补充↕ / 传递效率↕（各自归一）',L,T-10,C.mut,9,'left');
+  })();
+})();
+</script>
+</body>
+</html>
