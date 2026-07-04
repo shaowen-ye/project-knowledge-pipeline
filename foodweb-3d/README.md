@@ -75,8 +75,9 @@
 | **Meta-生态系统** | 04 §4 |
 | **历史 / 现状 / 进展** | 01, 02, 03 |
 | **难点 / 缺陷 / 不足** | 05 |
-| **集大成 / 制定开发** | 06 |
-| **发布发表顶刊** | 07 §论文线 |
+| **集大成 / 制定开发** | 06（框架）· 09（物理耦合）· 13（L2 规范）· 14（控制机制模型）· `prototype/`（可运行原型+适配器+理论模块） |
+| **发布发表顶刊** | 07（路线图）· 10/11/12（三线稿件计划）· 15（禁渔综合）· 16（投稿时间线）；已产出各线模型侧图 |
+| **软件工件（可引用）** | `prototype/`（MIT + 测试 + CI + CITATION）· 提取脚本 `scripts/` |
 
 ---
 
@@ -105,6 +106,9 @@
 | 生态基流 / 生态调度 | environmental flow / ecological operation | e-flow |
 | 生态系统途径渔业管理 | ecosystem-based fisheries management | EBFM |
 | 生态数字孪生 | ecological digital twin | — |
+| 空间控制机制 / 相图 | spatial control regime / phase diagram | — |
+| 觅食竞技场 / 广义 LV | foraging arena / generalized Lotka–Volterra | GLV |
+| 交换格式（模型无关） | model-agnostic interchange format | L2 |
 
 ---
 
@@ -116,7 +120,11 @@
 
 ---
 
-## 现状 / Status
+## 现状 / Status（详见 [07-roadmap.md](07-roadmap.md)、[16-submission-timeline.md](16-submission-timeline.md)）
 
-- **阶段 0（本知识库）**：进行中 → 完成即为可用综述底本与路线图。
-- **阶段 1（3D 原型）**、**阶段 2（长江数据/耦合）**、**阶段 3（论文序列）**：见 [07-roadmap.md](07-roadmap.md)，本次未实现。
+- **阶段 0（知识库 01–09）**：✅ 完成。
+- **阶段 1（3D 原型）**：✅ 完成——`prototype/`，7 情景交互。
+- **阶段 2（真实强迫 + 物理↔营养双向耦合）**：✅ 降阶版落地（三峡锚定，[09](09-phase2-coupling.md)）；真实内核（GLM-AED/CE-QUAL-W2）+ 实测配平待数据。
+- **阶段 3（三条论文线）**：🟡 稿件计划均成文（[10](10-paper3-manuscript-plan.md)/[11](11-paper1-theory-plan.md)/[12](12-paper2-software-plan.md)），关键成果已落地——线 1 控制机制相图（[14](14-spatial-control-regime-model.md)）、线 2 双引擎适配器往返 + 测试/CI/许可（[13](13-L2-interchange-spec.md)）、线 3 禁渔综合 + 符号验证（[15](15-paper3-ban-synthesis.md)）；待正文写作、真实数据、独立仓库化 + Zenodo DOI。
+
+**决策记录**：D-001…D-008（[DECISIONS.md](DECISIONS.md)）。**软件测试**：`prototype/` 9 项测试全通过（引擎/Schema/适配器/理论/闭式）。
