@@ -1,0 +1,26 @@
+{
+  "name": "foodweb-3d",
+  "version": "0.3.0",
+  "description": "Open, spatially explicit, 3D-interactive, uncertainty-aware food-web simulation framework for regulated inland waters, with a model-agnostic interchange format and two-way physics–trophic coupling.",
+  "keywords": ["food-web", "meta-ecosystem", "ecopath", "mizer", "size-spectrum", "trophic-cascade", "wasp-waist", "reservoir", "three-gorges", "ecological-modelling", "3d-visualization"],
+  "license": "MIT",
+  "type": "commonjs",
+  "main": "src/engine.js",
+  "scripts": {
+    "test": "node tests/run.js",
+    "roundtrip": "node adapters/roundtrip-test.js",
+    "phase-diagram": "node theory/phase-diagram.js",
+    "adapters": "node adapters/rpath-adapter.js export data/foodweb-yangtze.json adapters/out/ && node adapters/mizer-adapter.js export data/foodweb-yangtze.json adapters/out/"
+  },
+  "devDependencies": {
+    "ajv": "^8.17.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shaowen-ye/project-knowledge-pipeline.git",
+    "directory": "foodweb-3d/prototype"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

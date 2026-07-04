@@ -79,6 +79,22 @@ python3 -m http.server 8000   # 然后访问 http://localhost:8000/
 
 本原型是 [`../07-roadmap.md`](../07-roadmap.md) **论文线 2（方法+软件 → *MEE* / *Ecological Modelling*）** 的工具雏形：一个开源、3D 交互、时空+情景、不确定性感知的框架。阶段 2 将把 `engine.js` 换为真实耦合模型（Ecopath/Ecosim + GLM-AED/CE-QUAL-W2），把合成数据换为长江实测，并把 L2 交换格式规范化。
 
+## 开发与测试 / Develop &amp; test
+
+```bash
+npm install          # ajv（Schema 校验），来自 registry.npmjs.org
+npm test             # 引擎稳定性 + Schema + 适配器往返 + 理论模块（tests/run.js）
+npm run roundtrip    # 适配器一致性 + 生成原生引擎文件
+npm run phase-diagram
+```
+CI：`.github/workflows/ci.yml`（Node 18/20/22 矩阵，作为独立仓库骨架）。贡献指南见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 引用与许可 / Cite &amp; license
+
+- 许可：**MIT**（[LICENSE](LICENSE)；vendored three.js 亦 MIT）。
+- 引用：见 [CITATION.cff](CITATION.cff)。
+- 作为论文线 2（方法+软件）的可引用软件工件，规范见 [`../13-L2-interchange-spec.md`](../13-L2-interchange-spec.md)。
+
 ## 局限 / Caveats
 
 - 动态为**演示级** GLV press-perturbation，非校准的 Ecosim；数值经调参以产生可读的、方向正确的情景差异。

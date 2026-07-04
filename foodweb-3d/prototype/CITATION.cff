@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "foodweb-3d: an open, 3D-interactive, uncertainty-aware food-web simulation framework for regulated inland waters"
+abstract: >-
+  A spatially explicit framework that interconnects static mass-balance,
+  dynamic trophic, and physical water-body models through a model-agnostic
+  interchange format (L2), with a 3D-interactive, time-animated,
+  uncertainty-aware renderer and two-way physics–trophic coupling.
+  Demonstrated on the Yangtze / Three Gorges Reservoir.
+type: software
+version: "0.3.0"
+date-released: "2026-07-04"
+license: MIT
+repository-code: "https://github.com/shaowen-ye/project-knowledge-pipeline"
+url: "https://github.com/shaowen-ye/project-knowledge-pipeline/tree/main/foodweb-3d"
+authors:
+  - family-names: Ye
+    given-names: Shaowen
+keywords:
+  - food-web
+  - meta-ecosystem
+  - Ecopath
+  - size-spectrum
+  - trophic cascade
+  - wasp-waist
+  - reservoir
+  - Three Gorges
+  - ecological modelling
+  - 3D visualization
