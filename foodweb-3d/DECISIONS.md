@@ -28,8 +28,8 @@
 | ID | 日期 | 主题 | 域 | 状态 |
 |---|---|---|---|---|
 | D-001 | 2026-07-04 | 阶段 0 范围：交付物/锚定系统/顶刊定位/语言 | process | ✅ Accepted |
-| D-002 | | 技术选型（L3 前端 / L2 格式 / L1 编排语言） | tooling | 🟡 Proposed |
-| D-003 | | 旗舰水体选择（三峡库区 vs 鄱阳湖 vs 其他） | data | ⏸ Deferred |
+| D-002 | 2026-07-04 | 阶段 1 原型技术选型（L3 three.js / L2 JSON / L1 纯 JS） | tooling | ✅ Accepted |
+| D-003 | 2026-07-04 | 阶段 1 旗舰=3-patch 长江 meta 系统（示意级） | data | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -87,6 +87,89 @@
 
 ---
 
+### D-003 阶段 1 旗舰系统：3-patch 长江 meta-生态系统（示意级）
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: data
+- **Phase**: 阶段 1（3D 原型）
+
+**Background**
+
+阶段 1 原型需要一个具体系统来演示架构与交互。真实旗舰水体（三峡库区 vs 鄱阳湖 vs 多水体）依赖数据获取，属阶段 2 决策。原型阶段只需一个能同时体现"营养级 + 空间 + 情景 + meta-生态系统"的示意拓扑。
+
+**Options considered**
+
+1. 单一真实水体实测数据（阻塞于数据获取）
+2. 3-patch 示意 meta-生态系统（上游河段 / 三峡库区 / 通江湖泊）+ 合成数据
+3. 通用无空间单 patch 食物网
+
+**Decision**
+
+采用 **3-patch 示意 meta-生态系统**（上游河段 / 三峡库区 / 通江湖泊）+ ~18 功能组合成数据；跨-patch 补给流（漂流/洄游/消落带）体现 meta-生态系统层。真实旗舰水体推迟到阶段 2（见开放问题）。
+
+**Rationale**
+
+1. 3-patch 拓扑直接演示 meta-生态系统空间流（本项目理论支柱，[04](04-theory.md) §4），优于单 patch。
+2. 合成数据解耦"架构演示"与"数据获取"，不阻塞阶段 1。
+3. 量级参照文献（长江中游 Ecopath、引种银鱼三库等），示意但不失真。
+
+**Consequences**
+
+- ✓ 阶段 1 不被数据获取阻塞，可立即演示。
+- ✓ 空间流可视化就位，为阶段 2 真实耦合留好接口。
+- ✗ 结果不可作科研结论——README 与界面均显式标注"演示级/合成"。
+- ✗ 真实旗舰水体仍待定（阶段 2）。
+
+**References**
+
+- Code: `prototype/data/foodweb-yangtze.json`, `prototype/README.md`
+- Related decisions: D-001, D-002
+
+---
+
+### D-002 阶段 1 原型技术选型：three.js(L3) / JSON(L2) / 纯 JS 引擎(L1)
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: tooling
+- **Phase**: 阶段 1（3D 原型）
+
+**Background**
+
+阶段 1 需落地 [06](06-framework-design.md) 的 L1→L2→L3 三层。渲染层、交换格式、引擎语言各需选型，且要能作为自包含 Artifact 渲染（CSP 禁外部请求）。
+
+**Options considered**
+
+1. L3：three.js/WebGL vs deck.gl vs 原生 WebGL
+2. L2：JSON(+data.js 全局) vs NetCDF/Parquet
+3. L1：纯 JS 浏览器内 vs 调 R/Python 后端
+
+**Decision**
+
+L3 = **three.js r128 UMD**（暴露 `window.THREE`，全内联，CSP 友好）+ OrbitControls；L2 = **JSON** 交换格式实例 + 生成的 `data.js` 全局（免 `fetch`，`file://` 可运行）；L1 = **纯 JS** 生物量动态积分器（GLV，t0 质量平衡，浏览器/Node 双运行）。three.js 经 npm registry（代理白名单）取得并入库 `vendor/`。
+
+**Rationale**
+
+1. three.js UMD 内联使同一文件既可本地开、又可 GitHub、又可 Artifact（CSP 下零外部请求，已验证）。
+2. JSON 直读、易审阅，阶段 1 数据量小；重数组（NetCDF/Parquet）留待阶段 2。
+3. 纯 JS 引擎零后端依赖，原型即开即用；阶段 2 再换真实耦合引擎（Ecopath/Ecosim + GLM-AED）。
+4. unpkg/CDN 被 egress 策略拦截（403），故经 npm registry 取 three 并入库。
+
+**Consequences**
+
+- ✓ 单文件自包含，浏览器/GitHub/Artifact 三处可用，已无头验证（零外部请求、无报错）。
+- ✓ 引擎可 Node 单测，便于调参与回归。
+- ✗ 演示级 GLV 非校准 Ecosim；vendor/three.min.js（~600KB）入库增大仓库体积。
+- ✗ 纯前端不适合阶段 2 的重耦合计算——届时需引入后端/离线批算。
+
+**References**
+
+- Code: `prototype/src/{engine,render,ui}.js`, `prototype/index.html`, `prototype/index.artifact.html`, `prototype/vendor/`
+- Related decisions: D-001, D-003
+
+---
+
 ## 4. 已废止决策 / Superseded
 
 （暂无 / none yet）
@@ -97,8 +180,8 @@
 
 > 需尽快决定但未成熟。决定后移入 §3。
 
-- [ ] **D-002 技术选型**：L3 前端 three.js vs deck.gl；L2 交换格式 JSON+Parquet vs NetCDF；L1 编排 Python(`reticulate`) 为主 vs R(`shiny`/`plumber`) 为主。
-- [ ] **D-003 旗舰水体**：三峡库区（调度信号强、数据多）vs 鄱阳湖（水位-连通、meta-生态系统叙事强）vs 多水体对比。
+- [ ] **阶段 2 真实旗舰水体**：三峡库区（调度信号强、数据多）vs 鄱阳湖（水位-连通、meta-生态系统叙事强）vs 多水体对比。（阶段 1 用 3-patch 示意，见 D-003）
+- [ ] **阶段 2 引擎升级**：把演示级 GLV 替换为真实耦合（Ecopath/Ecosim + GLM-AED/CE-QUAL-W2）的具体接法与 L2 格式规范化（JSON→加 Parquet/NetCDF 大数组）。
 - [ ] 论文线 3 的**数据来源与授权**：先用已发表数据综合，还是申请原始监测数据/建立合作？
 - [ ] 是否纳入 Atlantis/OSMOSE 作为可选高保真引擎，还是先只做 EwE/mizer/LIM + GLM-AED/CE-QUAL-W2？
 

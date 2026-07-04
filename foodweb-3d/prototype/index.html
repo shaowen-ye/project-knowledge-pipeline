@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>食物网 3D 交互模拟原型 · 长江 meta-生态系统</title>
+<style>
+  /* Deep-water palette: teal-biased neutrals (chosen, not defaulted) + aquatic cyan accent.
+     Deliberate single dark theme — a stratified water-column visualization. */
+  :root { --bg:#06121a; --panel:#0b1c24; --border:#1b3540; --fg:#e8f1f2; --mut:#7d9aa3; --accent:#38bec9; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; overflow:hidden; }
+  #app { display:flex; height:100vh; }
+  #scene { flex:1; position:relative; min-width:0; }
+  #panel { width:310px; flex:none; background:var(--panel); border-left:1px solid var(--border);
+    padding:14px 16px; overflow-y:auto; }
+  h1 { font-size:15px; margin:0 0 2px; }
+  .sub { font-size:11px; color:var(--mut); margin-bottom:12px; line-height:1.5; }
+  h2 { font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.04em;
+    margin:16px 0 8px; border-bottom:1px solid var(--border); padding-bottom:4px; }
+  #scenarios { display:flex; flex-wrap:wrap; gap:6px; }
+  .scen-btn { background:#21262d; color:var(--fg); border:1px solid var(--border); border-radius:6px;
+    padding:5px 9px; font-size:12px; cursor:pointer; }
+  .scen-btn:hover { border-color:var(--accent); }
+  .scen-btn.active { background:var(--accent); color:#0d1117; border-color:var(--accent); font-weight:600; }
+  #scen-desc { font-size:11px; color:var(--mut); margin-top:8px; line-height:1.5; min-height:30px; }
+  .row { display:flex; align-items:center; gap:8px; margin:8px 0; font-size:12px; }
+  #month { width:100%; }
+  #play { background:#21262d; border:1px solid var(--border); color:var(--fg); border-radius:6px;
+    padding:5px 12px; cursor:pointer; font-size:12px; }
+  #month-label { font-size:11px; color:var(--mut); }
+  label.tog { display:flex; align-items:center; gap:7px; font-size:12px; margin:6px 0; cursor:pointer; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin:5px 0; font-size:11px; }
+  .bar-row .name { width:78px; color:var(--mut); flex:none; }
+  .bar-track { flex:1; background:#21262d; border-radius:4px; height:12px; overflow:hidden; display:block; }
+  .bar-fill { display:block; height:100%; width:0; transition:width .25s; }
+  .metrics { display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; font-size:12px; margin-top:8px; }
+  .metrics b { color:var(--fg); }
+  .metrics span { color:var(--mut); }
+  #legend { display:flex; flex-wrap:wrap; gap:6px 12px; font-size:11px; color:var(--mut); margin-top:6px; }
+  .legend-item { display:flex; align-items:center; gap:5px; }
+  .legend-item i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+  .note { font-size:10.5px; color:var(--mut); margin-top:14px; line-height:1.5;
+    border-top:1px solid var(--border); padding-top:8px; }
+  #hint { position:absolute; left:12px; bottom:12px; font-size:11px; color:var(--mut);
+    background:rgba(13,17,23,.6); padding:5px 9px; border-radius:6px; }
+  #err { position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    text-align:center; padding:40px; color:#f85149; font-size:14px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="scene">
+    <div id="hint">拖动旋转 · 滚轮缩放 · 右键平移 &nbsp;|&nbsp; 能量粒子沿边由猎物 → 捕食者向上流动</div>
+    <div id="err"></div>
+  </div>
+  <div id="panel">
+    <h1>食物网 3D 交互模拟原型</h1>
+    <div class="sub">长江 3-patch 元生态系统（上游河段 · 三峡库区 · 通江湖泊）<br>
+      y 轴 = 营养级 · 球体 = 功能组（大小∝生物量）· 灰边 = 营养流（粗细∝通量）· 橙弧 = 跨-patch 补给</div>
+
+    <h2>管理情景 / Scenario</h2>
+    <div id="scenarios"></div>
+    <div id="scen-desc"></div>
+
+    <h2>时间 / Time</h2>
+    <div class="row"><button id="play">▶ 播放</button><span id="month-label">第 0 月 / Year 0.0</span></div>
+    <input type="range" id="month" min="0" max="120" value="0" step="1" />
+
+    <h2>控制机制 / Control</h2>
+    <div class="bar-row"><span class="name">上行 Bottom-up</span><span class="bar-track"><span id="bar-bu" class="bar-fill" style="background:#66bb6a"></span></span></div>
+    <div class="bar-row"><span class="name">下行 Top-down</span><span class="bar-track"><span id="bar-td" class="bar-fill" style="background:#ef5350"></span></span></div>
+    <div class="bar-row"><span class="name">蜂腰 Wasp-waist</span><span class="bar-track"><span id="bar-ww" class="bar-fill" style="background:#42a5f5"></span></span></div>
+
+    <h2>网络指标 / Network</h2>
+    <div class="metrics">
+      <div><span>总通量 TST</span> <b id="m-tst">–</b></div>
+      <div><span>连接度</span> <b id="m-conn">–</b></div>
+      <div><span>传递效率</span> <b id="m-te">–</b></div>
+      <div><span>总生物量</span> <b id="m-tot">–</b></div>
+    </div>
+
+    <h2>显示 / Display</h2>
+    <label class="tog"><input type="checkbox" id="t-particles" checked> 能量粒子流</label>
+    <label class="tog"><input type="checkbox" id="t-inter" checked> 跨-patch 补给弧（meta-生态系统）</label>
+    <label class="tog"><input type="checkbox" id="t-uncertainty"> 不确定性壳层（±CV）</label>
+    <label class="tog"><input type="checkbox" id="t-labels" checked> 节点标签</label>
+
+    <h2>图例 / Legend</h2>
+    <div id="legend"></div>
+
+    <div class="note">演示级模型 + 合成/示意数据（量级参照文献），非实测结果。<br>
+      架构：L1 引擎 (engine.js) → L2 交换格式 (JSON) → L3 渲染 (three.js)。详见
+      <code>foodweb-3d/06-framework-design.md</code>。</div>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="data/data.js"></script>
+<script src="src/engine.js"></script>
+<script src="src/render.js"></script>
+<script src="src/ui.js"></script>
+<script>
+  (function () {
+    function fail(msg) {
+      var e = document.getElementById('err');
+      e.style.display = 'flex'; e.textContent = msg;
+    }
+    if (!window.THREE) return fail('three.js 未加载 / three.js failed to load');
+    if (!window.FOODWEB_DATA) return fail('数据未加载 / data.js failed to load');
+    try { window.FoodwebUI.boot(window.FOODWEB_DATA); }
+    catch (err) { fail('初始化失败 / init error: ' + err.message); console.error(err); }
+  })();
+</script>
+</body>
+</html>
