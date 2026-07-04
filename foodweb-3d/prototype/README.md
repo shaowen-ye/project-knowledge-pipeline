@@ -89,6 +89,8 @@ npm run phase-diagram
 ```
 CI：`.github/workflows/ci.yml`（Node 18/20/22 矩阵，作为独立仓库骨架）。贡献指南见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+**提取为独立仓库**（论文线 2 §T5）：本机运行 `bash scripts/extract-standalone-repo.sh [名称] [--private|--public]`——subtree split 保留历史 + `gh` 建仓 + 推送 + 打 v0.3.0（自包含 README 见 `scripts/README-standalone.md`）。须本机跑：本会话 GitHub 集成无建仓权限。
+
 ## 引用与许可 / Cite &amp; license
 
 - 许可：**MIT**（[LICENSE](LICENSE)；vendored three.js 亦 MIT）。

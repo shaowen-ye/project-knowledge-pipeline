@@ -34,6 +34,7 @@
 | D-005 | 2026-07-04 | 阶段 2 物理锚定=三峡库区（真实调度曲线+水温气候态） | data | ✅ Accepted |
 | D-006 | 2026-07-04 | 论文线 2 硬门槛：L2 规范 + Rpath/mizer 双适配器（原生格式，往返验证） | tooling | ✅ Accepted |
 | D-007 | 2026-07-04 | 论文线 1 理论核心：meta-生态系统模块 + per-capita 控制机制分类 → 相图 | methodology | ✅ Accepted |
+| D-008 | 2026-07-04 | 独立仓库化用脚本交付（会话集成无建仓权限），用户本机运行 | process | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -342,6 +343,45 @@ L3 = **three.js r128 UMD**（暴露 `window.THREE`，全内联，CSP 友好）+ 
 - Code: `prototype/theory/metaecosystem.js`, `phase-diagram.js`, `theory-figures.html`
 - Docs: `14-spatial-control-regime-model.md`, `11-paper1-theory-plan.md`
 - Related decisions: D-001（长江锚定）, D-004（耦合思路）
+
+---
+
+### D-008 独立仓库化以脚本交付（会话集成无建仓权限）
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: process
+- **Phase**: 论文线 2 发布准备
+
+**Background**
+
+论文线 2 需把 `prototype/` 提取为独立开源仓库以拿 Zenodo DOI。尝试经 GitHub MCP 建仓返回 403（Resource not accessible by integration）——本会话集成仅授权 project-knowledge-pipeline。
+
+**Options considered**
+
+1. 交付本机运行的提取脚本（subtree split + gh 建仓 + push + tag）
+2. 经 MCP push_files 逐文件建库（受 403 阻塞;且 600KB vendored three.js 不宜 API 推）
+3. 放弃独立仓库,留在子目录
+
+**Decision**
+
+采用**方案 1**：`prototype/scripts/extract-standalone-repo.sh`（保留历史）+ `README-standalone.md`（自包含,无 ../ 断链）。用户本机 `gh`（有建仓权限）一条命令完成建仓/推送/打 v0.3.0;Zenodo DOI 随后。
+
+**Rationale**
+
+1. 会话集成无建仓权限是硬约束,脚本把动作交给有权限的本机 `gh`。
+2. subtree split 保留 prototype 开发历史,优于逐文件 API 推。
+3. 自包含 README 避免独立仓库中 ../ 链接断裂。
+
+**Consequences**
+
+- ✓ 一条命令可复现地建库;历史保留;为 Zenodo DOI 铺好路。
+- ✗ 需用户本机执行（非全自动）；DOI 与 JOSS 短文仍待用户完成后续。
+
+**References**
+
+- Code: `prototype/scripts/extract-standalone-repo.sh`, `README-standalone.md`
+- Related decisions: D-006, D-002
 
 ---
 
