@@ -32,6 +32,7 @@
 | D-003 | 2026-07-04 | 阶段 1 旗舰=3-patch 长江 meta 系统（示意级） | data | ✅ Accepted |
 | D-004 | 2026-07-04 | 阶段 2 物理↔营养双向耦合（降阶物理 + 真实强迫） | methodology | ✅ Accepted |
 | D-005 | 2026-07-04 | 阶段 2 物理锚定=三峡库区（真实调度曲线+水温气候态） | data | ✅ Accepted |
+| D-006 | 2026-07-04 | 论文线 2 硬门槛：L2 规范 + Rpath/mizer 双适配器（原生格式，往返验证） | tooling | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -254,6 +255,48 @@ L3 = **three.js r128 UMD**（暴露 `window.THREE`，全内联，CSP 友好）+ 
 - Code: `prototype/src/physics.js`, `prototype/src/engine.js`（coupling 块）, `prototype/src/ui.js`（物理面板）
 - Docs: `09-phase2-coupling.md`
 - Related decisions: D-002, D-005
+
+---
+
+### D-006 论文线 2 硬门槛：L2 规范 + Rpath/mizer 双适配器（原生格式，往返验证）
+
+- **Date**: 2026-07-04
+- **Status**: ✅ Accepted
+- **Domain**: tooling
+- **Phase**: 论文线 2 投稿准备
+
+**Background**
+
+论文线 2（[12](12-paper2-software-plan.md)）软件刊投稿硬门槛是"L2 有规范 + ≥1 真实引擎适配器证明模型无关"。沙箱无 R（CRAN 被 egress 拦截），无法在线运行 Rpath/mizer。
+
+**Options considered**
+
+1. Node 适配器输出各引擎**原生文件格式** + 往返测试（无需运行 R）
+2. 安装 R + Rpath/mizer 在线运行（CRAN 不可达，阻塞）
+3. 仅写规范不做适配器（不满足硬门槛）
+
+**Decision**
+
+采用**方案 1**：`13-L2-interchange-spec.md` + `l2-schema.json`（JSON Schema，数据已校验）；两个适配器 `rpath-adapter.js`（Ecopath 质量平衡）+ `mizer-adapter.js`（体型谱）输出可被 `read.rpath.params()`/`newMultispeciesParams()` 直接载入的原生文件；`roundtrip-test.js` 证明结构字段往返无损（全通过）。为此把 L2 group 扩展可选字段 `pb/qb/ee`（Ecopath）与 `w_inf/w_mat`（体型谱），schema 升 0.3。
+
+**Rationale**
+
+1. 输出原生格式 + 往返无损，是"模型无关"的可验证、可复现证据,不依赖沙箱装 R。
+2. 选**两种正交范式**（质量平衡 vs 体型谱）比单引擎更有说服力。
+3. 同一 schema 同时承载 pb/qb 与 w_inf,正是模型无关设计的体现。
+
+**Consequences**
+
+- ✓ 论文线 2 硬门槛 T2/T3 达成;Fig 2 有实体支撑。
+- ✓ 往返测试可纳入 CI,作为持续保证。
+- ✗ 往返仅保证结构字段;引擎特有参数（fleet/discards、k_vb）用默认值,留待 v0.4。
+- ✗ 未在真实 R 中端到端跑 Rpath/mizer（环境限制）——生成文件格式正确、可离线载入,但完整 EBM 运行需用户在装 R 的环境验证。
+
+**References**
+
+- Code: `prototype/adapters/{rpath,mizer}-adapter.js`, `roundtrip-test.js`, `data/l2-schema.json`
+- Docs: `13-L2-interchange-spec.md`, `12-paper2-software-plan.md` §7/§9
+- Related decisions: D-002
 
 ---
 

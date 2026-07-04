@@ -51,6 +51,10 @@ python3 -m http.server 8000   # 然后访问 http://localhost:8000/
 | `index.html` | — | 组装（分文件版） |
 | `index.artifact.html` | — | 内联单文件（构建产物） |
 | `vendor/` | — | three.js r128 UMD + OrbitControls（经 npm registry 取得并入库，离线可用） |
+| `data/l2-schema.json` | L2 | 交换格式 JSON Schema（Draft-07），数据已校验通过 |
+| `adapters/rpath-adapter.js` | 互操作 | L2 ↔ **Rpath**（Ecopath）原生 CSV，双向 |
+| `adapters/mizer-adapter.js` | 互操作 | L2 ↔ **mizer**（体型谱）原生输入，双向 |
+| `adapters/roundtrip-test.js` | 互操作 | 往返一致性测试（`node adapters/roundtrip-test.js`，全通过）；输出原生文件到 `adapters/out/`。详见 [`../13-L2-interchange-spec.md`](../13-L2-interchange-spec.md) |
 
 ## 6 情景说明 / Scenarios
 

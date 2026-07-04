@@ -133,11 +133,13 @@ GitHub + Zenodo DOI;许可（MIT/BSD）;文档站;测试（引擎 Node 单测已
 
 ## 9. 任务清单 / Task checklist
 - [ ] **T1**：独立开源仓库 + 许可 + 版本/release。
-- [ ] **T2**：**L2 交换格式规范**单独文档（字段/语义/版本/示例）→ Fig 2。
-- [ ] **T3**：≥1 真实引擎适配器（**Rpath** 或 **mizer**）读写 L2 → 证明"模型无关"（投稿硬门槛）。
-- [ ] **T4**：CI + 单元测试（守恒/稳定/往返）;文档站。
+- [x] **T2**：**L2 交换格式规范**单独文档（字段/语义/版本/示例）→ Fig 2。✅ [`13-L2-interchange-spec.md`](13-L2-interchange-spec.md) + `prototype/data/l2-schema.json`（JSON Schema，已校验通过）。
+- [x] **T3**：≥1 真实引擎适配器证明"模型无关"（投稿硬门槛）。✅ **已提供 2 个**：`prototype/adapters/rpath-adapter.js`（Ecopath 质量平衡）+ `mizer-adapter.js`（体型谱）——两种正交范式经 L2 往返无损，`roundtrip-test.js` 全通过。
+- [ ] **T4**：CI + 完整单元测试;文档站。（已有：引擎 Node 稳定性测试 + 适配器往返测试）
 - [ ] **T5**：Zenodo DOI;JOSS 伴随短文。
 - [ ] **T6**：整理 Fig 1/3/4/5 + Table 1;写作按 §5;投 MEE Applications。
+
+> **投稿硬门槛 T2/T3 已达成**——L2 有规范+Schema、有 2 个真实引擎适配器且往返验证。剩余为工程化（独立仓库/许可/CI/DOI）与写作。
 
 ---
 

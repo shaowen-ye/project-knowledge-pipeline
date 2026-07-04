@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/shaowen-ye/project-knowledge-pipeline/foodweb-3d/l2-schema.json",
+  "title": "Food-web L2 interchange format",
+  "description": "Model-agnostic interchange format for meta-ecosystem food-web models: static network + dynamic trophic + spatial subsidies + physical forcing + management scenarios. Version 0.3.",
+  "type": "object",
+  "required": ["meta", "groups", "diet"],
+  "additionalProperties": true,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schema_version"],
+      "properties": {
+        "schema_version": { "type": "string" },
+        "months": { "type": "integer", "minimum": 1 },
+        "engine": { "type": "object" },
+        "provenance": { "type": "object" }
+      }
+    },
+    "patches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name_zh": { "type": "string" },
+          "name_en": { "type": "string" },
+          "x": { "type": "number" }
+        }
+      }
+    },
+    "groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "B0"],
+        "properties": {
+          "id": { "type": "string" },
+          "name_zh": { "type": "string" },
+          "name_en": { "type": "string" },
+          "type": { "enum": ["detritus", "producer", "consumer", "planktivore", "herbivore", "omnivore", "predator", "apex"] },
+          "tl": { "type": "number", "minimum": 1 },
+          "patch": { "type": "string" },
+          "B0": { "type": "number", "minimum": 0 },
+          "cv": { "type": "number", "minimum": 0 },
+          "fished": { "type": "number", "minimum": 0 },
+          "carp4": { "type": "boolean" },
+          "pb": { "type": "number", "minimum": 0, "description": "production/biomass yr^-1 (Ecopath)" },
+          "qb": { "type": "number", "minimum": 0, "description": "consumption/biomass yr^-1 (Ecopath)" },
+          "ee": { "type": "number", "minimum": 0, "maximum": 1, "description": "ecotrophic efficiency (Ecopath)" },
+          "w_inf": { "type": "number", "minimum": 0, "description": "asymptotic mass g (size-spectrum)" },
+          "w_mat": { "type": "number", "minimum": 0, "description": "maturation mass g (size-spectrum)" }
+        }
+      }
+    },
+    "diet": {
+      "type": "object",
+      "description": "predator id -> { prey id -> diet fraction }; fractions per predator should sum to ~1",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "inter_edges": {
+      "type": "array",
+      "description": "cross-patch subsidy / migration flows (meta-ecosystem layer)",
+      "items": {
+        "type": "object",
+        "required": ["source_patch", "target_patch", "group"],
+        "properties": {
+          "source_patch": { "type": "string" },
+          "target_patch": { "type": "string" },
+          "group": { "type": "string" },
+          "type_zh": { "type": "string" },
+          "type_en": { "type": "string" },
+          "magnitude": { "type": "number", "minimum": 0 }
+        }
+      }
+    },
+    "physics": {
+      "type": "object",
+      "description": "physical forcing for the coupled water body",
+      "properties": {
+        "waterLevel_m": { "type": "array", "items": { "type": "number" }, "minItems": 12, "maxItems": 12 },
+        "temp_c": { "type": "array", "items": { "type": "number" }, "minItems": 12, "maxItems": 12 },
+        "spawnTempThreshold_c": { "type": "number" },
+        "dispatchPeakMonth": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "coupling": { "type": "object" }
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id"],
+        "properties": {
+          "id": { "type": "string" },
+          "name_zh": { "type": "string" },
+          "name_en": { "type": "string" },
+          "removeFishing": { "type": "boolean" },
+          "stocking": { "type": "object" },
+          "dispatch": { "type": "boolean" },
+          "adaptiveDispatch": { "type": "boolean" },
+          "tempDelta": { "type": "number" },
+          "press": { "type": "object" }
+        }
+      }
+    }
+  }
+}
