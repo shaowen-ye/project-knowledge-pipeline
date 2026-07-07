@@ -6,7 +6,7 @@
 >
 > **维护者 / Maintainer**: [填写]
 > **起始 / Started**: 2026-07
-> **最后更新 / Last updated**: 2026-07-04
+> **最后更新 / Last updated**: 2026-07-07
 
 ---
 
@@ -36,6 +36,7 @@
 | D-007 | 2026-07-04 | 论文线 1 理论核心：meta-生态系统模块 + per-capita 控制机制分类 → 相图 | methodology | ✅ Accepted |
 | D-008 | 2026-07-04 | 独立仓库化用脚本交付（会话集成无建仓权限），用户本机运行 | process | 🔁 见 D-009 |
 | D-009 | 2026-07-04 | 迁移单元=整个 foodweb-3d/ → 独立私有仓库 shaowen-ye/foodweb-3d | process | ✅ Accepted |
+| D-010 | 2026-07-07 | 本地 Mac 工作副本以引导脚本交付（纯本地 git，无远端），补充 D-009 | process | ✅ Accepted |
 
 **状态图例**：✅ Accepted · 🟡 Proposed · ⏸ Deferred · 🔁 Revised · ❌ Superseded
 
@@ -44,6 +45,49 @@
 ## 3. 决策记录 / Decision records
 
 > 逆序，最新在上。✅ Accepted 后正文不可变，改动另开新条目引用之。
+
+---
+
+### D-010 本地 Mac 工作副本以引导脚本交付（纯本地 git，无 GitHub 远端）
+
+- **Date**: 2026-07-07
+- **Status**: ✅ Accepted（补充 D-009）
+- **Domain**: process
+- **Phase**: 项目独立化 / 本地工作环境
+
+**Background**
+
+用户希望在本地 Mac 指定文件夹（`/Users/YES/.../20_食物网结构与功能项目`）下建立本项目工作文件夹。本会话跑在云端隔离容器，**无法直接写用户本地磁盘**；且独立 GitHub 私有仓库（D-009）尚未创建（会话集成无建仓权限）。需一条**用户本机可跑、幂等、保留历史**的引导路径，且不被建仓权限阻塞。
+
+**Options considered**
+
+1. 引导脚本 `setup-local-workspace.sh`：clone pipeline 分支 → `subtree split` 提取整个 `foodweb-3d/` → 落地为**纯本地独立 git 仓库**（保留历史；无 subtree 时 `git archive` 快照兜底），不连任何远端
+2. 先建 GitHub 私有仓库（D-009）再 clone 到本地——被建仓权限阻塞，且用户当前只要本地工作副本
+3. 直接打包 tar 传给用户——无历史、非 git、不便迭代
+
+**Decision**
+
+采用**方案 1**：`foodweb-3d/scripts/setup-local-workspace.sh`，用户本机一条命令把整个 `foodweb-3d/` 从 GitHub 分支提取为 `<父目录>/foodweb-3d` 的**纯本地 git 仓库**（主分支 `main`、保留提交历史、无 `origin`）；含父目录/目标存在性校验，`git subtree` 不可用时自动改无历史快照。与 D-009（独立私有 GitHub 仓库）**互补而非替代**：本地工作副本可先行，GitHub 发布仓库按 `MIGRATION-CHECKLIST.md` 随后。
+
+**Rationale**
+
+1. 云端容器无法写用户本地磁盘是硬约束，引导脚本把动作交给有权限的用户本机。
+2. `subtree split` 保留开发历史，优于无历史 tar 快照；`archive` 兜底保证无 subtree 的环境仍可用。
+3. 纯本地无远端满足"先要本地工作文件夹"的诉求，不被建仓权限阻塞；GitHub 发布解耦为后续可选步骤。
+
+**Consequences**
+
+- ✓ 用户一条命令即得含完整历史的本地工作副本（16 文档 + prototype + scripts）；容器内已实测提取逻辑（`npm test` 9/9）。
+- ✓ 与 GitHub 独立仓库路径解耦，二者可各自推进。
+- ✗ 仍须用户本机执行（容器不可代跑）；中文/含空格路径需正确加引号。
+- ✗ 纯本地副本与未来 GitHub 仓库是两份，需用户自行决定何时对接（clone 远端 vs `git remote add`）。
+
+**References**
+
+- Code: `foodweb-3d/scripts/setup-local-workspace.sh`
+- Docs: `foodweb-3d/scripts/MIGRATION-CHECKLIST.md`
+- CC session: 2026-07-07 `本地 Mac 工作文件夹 · setup-local-workspace`
+- Related decisions: D-009（独立私有仓库，补充）、D-008
 
 ---
 
